@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>My Life RPG</title>
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
     :root {
       --bg: #121214;
@@ -22,8 +20,20 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 40px; max-width: 500px; margin: 0 auto; }
 
+    /* AUTH / LOGIN SCREEN */
+    #auth-screen { display: flex; flex-direction: column; justify-content: center; min-height: 80vh; }
+    .auth-card { background: var(--card); padding: 24px; border-radius: 16px; border: 1px solid #2d2d35; text-align: center; }
+    .auth-card h2 { margin-bottom: 12px; color: var(--accent); }
+    .auth-card input { width: 100%; margin-bottom: 12px; }
+    .auth-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-bottom: 10px; }
+    .auth-toggle { color: var(--subtext); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
+
+    /* MAIN APP (Hidden until logged in) */
+    #app-screen { display: none; }
+
     /* Stats Header */
-    .header { background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 1px solid #2d2d35; }
+    .header { background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #2d2d35; position: relative; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; color: var(--subtext); }
     .profile { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .level-badge { background: var(--accent); color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; }
     .currency { color: var(--accent-gold); font-weight: bold; font-size: 1.1rem; }
@@ -32,6 +42,10 @@
     .progress-container { background: #2d2d35; border-radius: 10px; height: 16px; width: 100%; overflow: hidden; margin-bottom: 6px; }
     .progress-bar { background: linear-gradient(90deg, #4f46e5, #818cf8); height: 100%; width: 0%; transition: width 0.3s ease; }
     .xp-text { font-size: 0.8rem; color: var(--subtext); text-align: right; }
+
+    /* Buttons in Header */
+    .header-btns { display: flex; gap: 8px; }
+    .icon-btn { background: #2d2d35; border: none; color: var(--text); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
 
     /* Tabs */
     .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
@@ -46,7 +60,7 @@
     .add-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid #2d2d35; }
     .form-row { display: flex; gap: 8px; width: 100%; }
     input, select { background: #121214; border: 1px solid #2d2d35; color: var(--text); padding: 10px; border-radius: 8px; outline: none; font-size: 0.9rem; }
-    input[type="text"] { flex: 1; }
+    input[type="text"], input[type="password"] { flex: 1; }
     .btn-add { background: var(--success); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
     /* Item list */
@@ -65,121 +79,259 @@
     .btn-count { background: #3b82f6; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .btn-timer { background: #8b5cf6; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .btn-delete { background: var(--card); border: 1px solid #3f3f46; color: #ef4444; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .btn-delete:hover { background: var(--danger); color: white; }
 
-    /* Toast effect */
+    /* Toast */
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 100; text-align: center; }
+
+    /* TUTORIAL MODAL */
+    .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; padding: 20px; z-index: 200; }
+    .modal-content { background: var(--card); border: 1px solid var(--accent); padding: 20px; border-radius: 16px; max-width: 400px; text-align: center; }
+    .modal-content h3 { color: var(--accent); margin-bottom: 10px; }
+    .modal-content p { color: var(--subtext); font-size: 0.95rem; line-height: 1.4; margin-bottom: 20px; }
+    .modal-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
   </style>
 </head>
 <body>
 
-  <!-- Header / Character Sheet -->
-  <div class="header">
-    <div class="profile">
-      <div class="level-badge" id="level">Lvl 1</div>
-      <div class="currency">🪙 <span id="gold">0</span> Gold</div>
+  <!-- AUTH SCREEN (LOGIN / REGISTER) -->
+  <div id="auth-screen">
+    <div class="auth-card">
+      <h2 id="auth-title">🎮 Welcome to Life RPG</h2>
+      <p style="color: var(--subtext); margin-bottom: 16px; font-size: 0.85rem;" id="auth-sub">Log in to continue your adventure</p>
+      
+      <form onsubmit="handleAuth(event)">
+        <input type="text" id="auth-user" placeholder="Username" required>
+        <input type="password" id="auth-pass" placeholder="Password" required>
+        <button type="submit" class="auth-btn" id="auth-submit-btn">Login</button>
+      </form>
+
+      <span class="auth-toggle" id="auth-toggle-btn" onclick="toggleAuthMode()">Need an account? Register here</span>
     </div>
-    <div class="progress-container">
-      <div class="progress-bar" id="xp-bar"></div>
+  </div>
+
+  <!-- MAIN APP SCREEN -->
+  <div id="app-screen">
+    <div class="header">
+      <div class="top-bar">
+        <span>Hero: <strong id="user-display" style="color: var(--text);">Player</strong></span>
+        <div class="header-btns">
+          <button class="icon-btn" onclick="startTutorial()">❓ Help</button>
+          <button class="icon-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+      </div>
+      <div class="profile">
+        <div class="level-badge" id="level">Lvl 1</div>
+        <div class="currency">🪙 <span id="gold">0</span> Gold</div>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar" id="xp-bar"></div>
+      </div>
+      <div class="xp-text"><span id="current-xp">0</span> / <span id="max-xp">100</span> XP</div>
     </div>
-    <div class="xp-text"><span id="current-xp">0</span> / <span id="max-xp">100</span> XP</div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('quests', this)">⚔️ Quests</button>
+      <button class="tab-btn" onclick="switchTab('goals', this)">🎯 Goals</button>
+      <button class="tab-btn" onclick="switchTab('shop', this)">🛒 Shop</button>
+    </div>
+
+    <!-- QUESTS SECTION -->
+    <div id="quests" class="section active">
+      <form class="add-form" onsubmit="addQuest(event)">
+        <div class="form-row">
+          <input type="text" id="quest-title" placeholder="New daily quest..." required>
+        </div>
+        <div class="form-row">
+          <select id="quest-type" onchange="toggleQuestInputs()" style="flex: 1;">
+            <option value="simple">⚡ Instant Complete</option>
+            <option value="counter">🔢 Counter / Count</option>
+            <option value="timer">⏱️ Timer (minutes)</option>
+          </select>
+          <input type="number" id="quest-target" placeholder="Count" value="8" min="1" style="width: 80px; display: none;">
+          <select id="quest-xp" style="width: 90px;">
+            <option value="25">25 XP</option>
+            <option value="50" selected>50 XP</option>
+            <option value="100">100 XP</option>
+            <option value="250">250 XP</option>
+          </select>
+          <button type="submit" class="btn-add">+</button>
+        </div>
+      </form>
+      <div class="list" id="quest-list"></div>
+    </div>
+
+    <!-- GOALS SECTION -->
+    <div id="goals" class="section">
+      <form class="add-form" onsubmit="addGoal(event)">
+        <div class="form-row">
+          <input type="text" id="goal-title" placeholder="Major life goal..." required>
+        </div>
+        <div class="form-row">
+          <select id="goal-xp" style="flex: 1;">
+            <option value="250">🎯 Small Goal (+250 XP)</option>
+            <option value="500" selected>🏆 Medium Goal (+500 XP)</option>
+            <option value="1000">👑 Epic Goal (+1000 XP)</option>
+          </select>
+          <button type="submit" class="btn-add">+</button>
+        </div>
+      </form>
+      <div class="list" id="goal-list"></div>
+    </div>
+
+    <!-- SHOP SECTION -->
+    <div id="shop" class="section">
+      <form class="add-form" onsubmit="addShopItem(event)">
+        <div class="form-row">
+          <input type="text" id="item-title" placeholder="Reward (e.g. 1hr gaming)..." required>
+          <input type="number" id="item-cost" placeholder="Gold" style="width: 80px;" required>
+          <button type="submit" class="btn-add">+</button>
+        </div>
+      </form>
+      <div class="list" id="shop-list"></div>
+    </div>
   </div>
 
-  <!-- Tab Navigation -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('quests', this)">⚔️ Quests</button>
-    <button class="tab-btn" onclick="switchTab('goals', this)">🎯 Goals</button>
-    <button class="tab-btn" onclick="switchTab('shop', this)">🛒 Shop</button>
+  <div class="toast" id="toast"></div>
+
+  <!-- TUTORIAL MODAL -->
+  <div class="modal-overlay" id="tutorial-modal">
+    <div class="modal-content">
+      <h3 id="tut-title">Welcome Hero! 🛡️</h3>
+      <p id="tut-body">Turn your real life into an RPG! Complete daily tasks, level up, earn gold, and reward yourself.</p>
+      <button class="modal-btn" id="tut-btn" onclick="nextTutorialStep()">Next ➡️</button>
+    </div>
   </div>
-
-  <!-- QUESTS SECTION -->
-  <div id="quests" class="section active">
-    <form class="add-form" onsubmit="addQuest(event)">
-      <div class="form-row">
-        <input type="text" id="quest-title" placeholder="New quest (e.g. Drink water)..." required>
-      </div>
-      <div class="form-row">
-        <select id="quest-type" onchange="toggleQuestInputs()" style="flex: 1;">
-          <option value="simple">⚡ Instant Complete</option>
-          <option value="counter">🔢 Counter / Count</option>
-          <option value="timer">⏱️ Timer (minutes)</option>
-        </select>
-        <input type="number" id="quest-target" placeholder="Count" value="8" min="1" style="width: 80px; display: none;">
-        <select id="quest-xp" style="width: 90px;">
-          <option value="25">25 XP</option>
-          <option value="50" selected>50 XP</option>
-          <option value="100">100 XP</option>
-          <option value="250">250 XP</option>
-        </select>
-        <button type="submit" class="btn-add">+</button>
-      </div>
-    </form>
-
-    <div class="list" id="quest-list"></div>
-  </div>
-
-  <!-- GOALS SECTION -->
-  <div id="goals" class="section">
-    <form class="add-form" onsubmit="addGoal(event)">
-      <div class="form-row">
-        <input type="text" id="goal-title" placeholder="Major goal (e.g. Get driver's license)..." required>
-      </div>
-      <div class="form-row">
-        <select id="goal-xp" style="flex: 1;">
-          <option value="250">🎯 Small Goal (+250 XP / +100 Gold)</option>
-          <option value="500" selected>🏆 Medium Goal (+500 XP / +200 Gold)</option>
-          <option value="1000">👑 Epic Goal (+1000 XP / +400 Gold)</option>
-          <option value="2500">🌟 Milestone (+2500 XP / +1000 Gold)</option>
-        </select>
-        <button type="submit" class="btn-add">+</button>
-      </div>
-    </form>
-
-    <div class="list" id="goal-list"></div>
-  </div>
-
-  <!-- SHOP SECTION -->
-  <div id="shop" class="section">
-    <form class="add-form" onsubmit="addShopItem(event)">
-      <div class="form-row">
-        <input type="text" id="item-title" placeholder="Reward (e.g. 1 hour gaming)..." required>
-        <input type="number" id="item-cost" placeholder="Gold" style="width: 80px;" required>
-        <button type="submit" class="btn-add">+</button>
-      </div>
-    </form>
-
-    <div class="list" id="shop-list"></div>
-  </div>
-
-  <div class="toast" id="toast">Quest Completed! 🎉</div>
 
   <script>
-    // State management
-    let defaultState = {
+    let isRegisterMode = false;
+    let currentUser = null;
+    let users = JSON.parse(localStorage.getItem('lifeRPG_users')) || {};
+
+    let defaultUserData = {
       xp: 0,
       level: 1,
       gold: 0,
+      hasSeenTutorial: false,
       quests: [
         { id: 1, title: 'Drink 8 glasses of water', type: 'counter', current: 0, target: 8, xp: 50, gold: 20 },
-        { id: 2, title: 'Study or read for 15 mins', type: 'timer', remainingSeconds: 15 * 60, targetSeconds: 15 * 60, isRunning: false, xp: 100, gold: 40 },
-        { id: 3, title: 'Clean room', type: 'simple', xp: 100, gold: 40 }
+        { id: 2, title: 'Clean room', type: 'simple', xp: 100, gold: 40 }
       ],
       goals: [
-        { id: 1, title: 'Get driver\'s license 🚗', xp: 1000, gold: 400 },
-        { id: 2, title: 'Lose 5kg 💪', xp: 500, gold: 200 }
+        { id: 1, title: "Get driver's license 🚗", xp: 1000, gold: 400 }
       ],
       shop: [
-        { id: 1, title: 'Watch 1 TV episode', cost: 30 },
-        { id: 2, title: 'Guilt-free gaming evening', cost: 100 }
+        { id: 1, title: 'Watch 1 TV episode', cost: 30 }
       ]
     };
 
-    let state = JSON.parse(localStorage.getItem('lifeRPG')) || defaultState;
-    if (!state.goals) state.goals = defaultState.goals;
+    // AUTH FUNCTIONS
+    function toggleAuthMode() {
+      isRegisterMode = !isRegisterMode;
+      document.getElementById('auth-title').innerText = isRegisterMode ? '✨ Create Account' : '🎮 Welcome to Life RPG';
+      document.getElementById('auth-sub').innerText = isRegisterMode ? 'Choose a username & password' : 'Log in to continue your adventure';
+      document.getElementById('auth-submit-btn').innerText = isRegisterMode ? 'Register' : 'Login';
+      document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? 'Already have an account? Login' : 'Need an account? Register here';
+    }
+
+    function handleAuth(e) {
+      e.preventDefault();
+      const u = document.getElementById('auth-user').value.trim().toLowerCase();
+      const p = document.getElementById('auth-pass').value.trim();
+
+      if (!u || !p) return;
+
+      if (isRegisterMode) {
+        if (users[u]) {
+          alert('Username already exists!');
+          return;
+        }
+        users[u] = { password: p, data: JSON.parse(JSON.stringify(defaultUserData)) };
+        saveUsers();
+        loginUser(u);
+      } else {
+        if (users[u] && users[u].password === p) {
+          loginUser(u);
+        } else {
+          alert('Invalid username or password!');
+        }
+      }
+    }
+
+    function loginUser(username) {
+      currentUser = username;
+      localStorage.setItem('lifeRPG_activeUser', username);
+      document.getElementById('user-display').innerText = username;
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+      
+      render();
+
+      if (!getUserData().hasSeenTutorial) {
+        startTutorial();
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem('lifeRPG_activeUser');
+      document.getElementById('app-screen').style.display = 'none';
+      document.getElementById('auth-screen').style.display = 'flex';
+      document.getElementById('auth-user').value = '';
+      document.getElementById('auth-pass').value = '';
+    }
+
+    function getUserData() {
+      return users[currentUser].data;
+    }
 
     function save() {
-      localStorage.setItem('lifeRPG', JSON.stringify(state));
+      saveUsers();
       render();
+    }
+
+    function saveUsers() {
+      localStorage.setItem('lifeRPG_users', JSON.stringify(users));
+    }
+
+    // TUTORIAL SYSTEM
+    let tutStep = 0;
+    const tutSteps = [
+      { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily tasks, level up, earn gold, and unlock real-life rewards." },
+      { title: "⚔️ Quests", body: "Add daily habits or tasks. Choose between Instant, Counter (e.g. 8 glasses of water), or Timers! Complete them to earn XP and Gold." },
+      { title: "🎯 Goals", body: "Set big, long-term achievements (like passing an exam or losing weight). These give massive XP and Gold bonuses!" },
+      { title: "🛒 The Shop", body: "Use your hard-earned Gold to buy real-life rewards you create (e.g., 1 hour of gaming, watching a movie, or a treat)." }
+    ];
+
+    function startTutorial() {
+      tutStep = 0;
+      showTutStep();
+      document.getElementById('tutorial-modal').style.display = 'flex';
+    }
+
+    function showTutStep() {
+      document.getElementById('tut-title').innerText = tutSteps[tutStep].title;
+      document.getElementById('tut-body').innerText = tutSteps[tutStep].body;
+      document.getElementById('tut-btn').innerText = tutStep === tutSteps.length - 1 ? "Let's Play! 🚀" : "Next ➡️";
+    }
+
+    function nextTutorialStep() {
+      tutStep++;
+      if (tutStep < tutSteps.length) {
+        showTutStep();
+      } else {
+        document.getElementById('tutorial-modal').style.display = 'none';
+        getUserData().hasSeenTutorial = true;
+        save();
+      }
+    }
+
+    // UI & TAB LOGIC
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
     }
 
     function toggleQuestInputs() {
@@ -205,40 +357,33 @@
     }
 
     function render() {
-      const maxXp = state.level * 100;
-      
-      // Update Stats
-      document.getElementById('level').innerText = `Lvl ${state.level}`;
-      document.getElementById('gold').innerText = state.gold;
-      document.getElementById('current-xp').innerText = state.xp;
+      if (!currentUser) return;
+      const data = getUserData();
+      const maxXp = data.level * 100;
+
+      document.getElementById('level').innerText = `Lvl ${data.level}`;
+      document.getElementById('gold').innerText = data.gold;
+      document.getElementById('current-xp').innerText = data.xp;
       document.getElementById('max-xp').innerText = maxXp;
-      document.getElementById('xp-bar').style.width = `${Math.min((state.xp / maxXp) * 100, 100)}%`;
+      document.getElementById('xp-bar').style.width = `${Math.min((data.xp / maxXp) * 100, 100)}%`;
 
       // Render Quests
       const questList = document.getElementById('quest-list');
-      questList.innerHTML = state.quests.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No active quests. Add one above!</p>' : '';
+      questList.innerHTML = data.quests.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No active quests.</p>' : '';
       
-      state.quests.forEach(q => {
+      data.quests.forEach(q => {
         let actionButtons = '';
         let extraBadge = '';
 
         if (q.type === 'counter') {
           extraBadge = ` • <span class="badge-progress">Progress: ${q.current}/${q.target}</span>`;
-          actionButtons = `
-            <button class="btn-count" onclick="incrementCounter(${q.id})">+1</button>
-            <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>
-          `;
+          actionButtons = `<button class="btn-count" onclick="incrementCounter(${q.id})">+1</button> <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>`;
         } else if (q.type === 'timer') {
           extraBadge = ` • <span class="badge-progress" id="time-disp-${q.id}">⏱️ ${formatTime(q.remainingSeconds)}</span>`;
           const playBtnText = q.isRunning ? '⏸️' : '▶️';
-          actionButtons = `
-            <button class="btn-timer" onclick="toggleTimer(${q.id})">${playBtnText}</button>
-            <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>
-          `;
+          actionButtons = `<button class="btn-timer" onclick="toggleTimer(${q.id})">${playBtnText}</button> <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>`;
         } else {
-          actionButtons = `
-            <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>
-          `;
+          actionButtons = `<button class="btn-action" onclick="completeQuest(${q.id})">✓</button>`;
         }
 
         questList.innerHTML += `
@@ -257,9 +402,8 @@
 
       // Render Goals
       const goalList = document.getElementById('goal-list');
-      goalList.innerHTML = state.goals.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No major goals set. Dream big and add one!</p>' : '';
-      
-      state.goals.forEach(g => {
+      goalList.innerHTML = data.goals.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No major goals set.</p>' : '';
+      data.goals.forEach(g => {
         goalList.innerHTML += `
           <div class="card goal-card">
             <div class="card-info">
@@ -276,8 +420,8 @@
 
       // Render Shop
       const shopList = document.getElementById('shop-list');
-      shopList.innerHTML = state.shop.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No rewards in the shop.</p>' : '';
-      state.shop.forEach(s => {
+      shopList.innerHTML = data.shop.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No rewards in shop.</p>' : '';
+      data.shop.forEach(s => {
         shopList.innerHTML += `
           <div class="card">
             <div class="card-info">
@@ -293,6 +437,7 @@
       });
     }
 
+    // ACTIONS & DATA MANIPULATION
     function addQuest(e) {
       e.preventDefault();
       const title = document.getElementById('quest-title').value;
@@ -302,17 +447,10 @@
       const targetVal = parseInt(document.getElementById('quest-target').value) || 1;
 
       const newQuest = { id: Date.now(), title, type, xp, gold };
+      if (type === 'counter') { newQuest.current = 0; newQuest.target = targetVal; }
+      else if (type === 'timer') { newQuest.targetSeconds = targetVal * 60; newQuest.remainingSeconds = targetVal * 60; newQuest.isRunning = false; }
 
-      if (type === 'counter') {
-        newQuest.current = 0;
-        newQuest.target = targetVal;
-      } else if (type === 'timer') {
-        newQuest.targetSeconds = targetVal * 60;
-        newQuest.remainingSeconds = targetVal * 60;
-        newQuest.isRunning = false;
-      }
-
-      state.quests.push(newQuest);
+      getUserData().quests.push(newQuest);
       document.getElementById('quest-title').value = '';
       save();
     }
@@ -323,121 +461,89 @@
       const xp = parseInt(document.getElementById('goal-xp').value);
       const gold = Math.round(xp / 2.5);
 
-      state.goals.push({ id: Date.now(), title, xp, gold });
+      getUserData().goals.push({ id: Date.now(), title, xp, gold });
       document.getElementById('goal-title').value = '';
       save();
     }
 
     function incrementCounter(id) {
-      const q = state.quests.find(item => item.id === id);
+      const q = getUserData().quests.find(item => item.id === id);
       if (!q) return;
-
       q.current += 1;
-      if (q.current >= q.target) {
-        completeQuest(id);
-      } else {
-        save();
-        showToast(`Progress: ${q.current}/${q.target}!`);
-      }
+      if (q.current >= q.target) completeQuest(id);
+      else { save(); showToast(`Progress: ${q.current}/${q.target}!`); }
     }
 
     function toggleTimer(id) {
-      const q = state.quests.find(item => item.id === id);
+      const q = getUserData().quests.find(item => item.id === id);
       if (!q) return;
-
       q.isRunning = !q.isRunning;
       save();
     }
 
     function addRewards(xpGained, goldGained) {
-      state.xp += xpGained;
-      state.gold += goldGained;
+      const data = getUserData();
+      data.xp += xpGained;
+      data.gold += goldGained;
 
-      let maxXp = state.level * 100;
+      let maxXp = data.level * 100;
       let levelUps = 0;
-      while (state.xp >= maxXp) {
-        state.xp -= maxXp;
-        state.level += 1;
+      while (data.xp >= maxXp) {
+        data.xp -= maxXp;
+        data.level += 1;
         levelUps++;
-        maxXp = state.level * 100;
+        maxXp = data.level * 100;
       }
 
-      if (levelUps > 0) {
-        showToast(`🎉 LEVEL UP! You reached Level ${state.level}! 🎉`);
-      } else {
-        showToast(`+${xpGained} XP | +${goldGained} Gold!`);
-      }
+      if (levelUps > 0) showToast(`🎉 LEVEL UP! Level ${data.level}! 🎉`);
+      else showToast(`+${xpGained} XP | +${goldGained} Gold!`);
     }
 
     function completeQuest(id) {
-      const quest = state.quests.find(q => q.id === id);
+      const data = getUserData();
+      const quest = data.quests.find(q => q.id === id);
       if (!quest) return;
-
       addRewards(quest.xp, quest.gold);
-      state.quests = state.quests.filter(q => q.id !== id);
+      data.quests = data.quests.filter(q => q.id !== id);
       save();
     }
 
     function completeGoal(id) {
-      const goal = state.goals.find(g => g.id === id);
+      const data = getUserData();
+      const goal = data.goals.find(g => g.id === id);
       if (!goal) return;
-
-      if (confirm(`Congratulations on completing: "${goal.title}"! Mark goal as finished?`)) {
+      if (confirm(`Completed: "${goal.title}"?`)) {
         addRewards(goal.xp, goal.gold);
-        state.goals = state.goals.filter(g => g.id !== id);
+        data.goals = data.goals.filter(g => g.id !== id);
         save();
       }
     }
 
-    function deleteQuest(id) {
-      state.quests = state.quests.filter(q => q.id !== id);
-      save();
-      showToast('Quest deleted');
-    }
-
-    function deleteGoal(id) {
-      state.goals = state.goals.filter(g => g.id !== id);
-      save();
-      showToast('Goal deleted');
-    }
+    function deleteQuest(id) { getUserData().quests = getUserData().quests.filter(q => q.id !== id); save(); }
+    function deleteGoal(id) { getUserData().goals = getUserData().goals.filter(g => g.id !== id); save(); }
 
     function addShopItem(e) {
       e.preventDefault();
       const title = document.getElementById('item-title').value;
       const cost = parseInt(document.getElementById('item-cost').value);
-
-      state.shop.push({ id: Date.now(), title, cost });
+      getUserData().shop.push({ id: Date.now(), title, cost });
       document.getElementById('item-title').value = '';
       document.getElementById('item-cost').value = '';
       save();
     }
 
     function buyItem(id) {
-      const item = state.shop.find(s => s.id === id);
+      const data = getUserData();
+      const item = data.shop.find(s => s.id === id);
       if (!item) return;
-
-      if (state.gold >= item.cost) {
-        state.gold -= item.cost;
-        showToast(`Purchased: ${item.title}! Enjoy! 🎁`);
+      if (data.gold >= item.cost) {
+        data.gold -= item.cost;
+        showToast(`Bought: ${item.title}! 🎁`);
         save();
-      } else {
-        alert('Not enough gold! Complete more quests first.');
-      }
+      } else alert('Not enough gold!');
     }
 
-    function deleteShopItem(id) {
-      state.shop = state.shop.filter(s => s.id !== id);
-      save();
-      showToast('Reward deleted');
-    }
-
-    function switchTab(tabId, btn) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      
-      btn.classList.add('active');
-      document.getElementById(tabId).classList.add('active');
-    }
+    function deleteShopItem(id) { getUserData().shop = getUserData().shop.filter(s => s.id !== id); save(); }
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
@@ -446,9 +552,10 @@
       setTimeout(() => toast.style.display = 'none', 3000);
     }
 
-    // Timer Tick Interval (Every second)
+    // TIMER INTERVAL
     setInterval(() => {
-      state.quests.forEach(q => {
+      if (!currentUser) return;
+      getUserData().quests.forEach(q => {
         if (q.type === 'timer' && q.isRunning) {
           if (q.remainingSeconds > 0) {
             q.remainingSeconds--;
@@ -462,8 +569,11 @@
       });
     }, 1000);
 
-    // Initial render
-    render();
+    // AUTO-LOGIN CHECK
+    const activeUser = localStorage.getItem('lifeRPG_activeUser');
+    if (activeUser && users[activeUser]) {
+      loginUser(activeUser);
+    }
   </script>
 </body>
 </html>
