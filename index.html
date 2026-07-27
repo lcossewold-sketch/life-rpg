@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>My Life RPG</title>
+
+  <!-- Firebase Web SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
   <style>
     :root {
       --bg: #121214;
@@ -68,7 +74,7 @@
     .add-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid #2d2d35; }
     .form-row { display: flex; gap: 8px; width: 100%; }
     input, select { background: #121214; border: 1px solid #2d2d35; color: var(--text); padding: 10px; border-radius: 8px; outline: none; font-size: 0.9rem; }
-    input[type="text"], input[type="password"] { flex: 1; }
+    input[type="text"], input[type="email"], input[type="password"] { flex: 1; }
     .btn-add { background: var(--success); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
     /* Item list */
@@ -107,18 +113,14 @@
   <div id="auth-screen">
     <div class="auth-card">
       <h2 id="auth-title">🎮 Welcome to Life RPG</h2>
-      <p style="color: var(--subtext); margin-bottom: 16px; font-size: 0.85rem;" id="auth-sub">Log in to continue your adventure</p>
+      <p style="color: var(--subtext); margin-bottom: 16px; font-size: 0.85rem;" id="auth-sub">Log in with your email to continue</p>
       
       <form onsubmit="handleAuth(event)">
-        <input type="text" id="auth-user" placeholder="Username" required>
+        <input type="email" id="auth-email" placeholder="Email Address" required>
         
         <div class="password-container">
           <input type="password" id="auth-pass" placeholder="Password" required>
           <button type="button" class="toggle-eye" id="eye-btn" onclick="togglePasswordVisibility('auth-pass', 'eye-btn')">👁️</button>
-        </div>
-
-        <div id="secret-word-container" style="display: none;">
-          <input type="text" id="auth-secret" placeholder="Secret Recovery Word (e.g. Pet's name)">
         </div>
 
         <button type="submit" class="auth-btn" id="auth-submit-btn">Login</button>
@@ -126,7 +128,7 @@
 
       <div class="auth-links">
         <span class="auth-toggle" id="auth-toggle-btn" onclick="toggleAuthMode()">Need an account? Register here</span>
-        <span class="auth-forgot" id="auth-forgot-btn" onclick="openForgotModal()">Forgot password?</span>
+        <span class="auth-forgot" id="auth-forgot-btn" onclick="sendPasswordReset()">Forgot password?</span>
       </div>
     </div>
   </div>
@@ -225,31 +227,26 @@
     </div>
   </div>
 
-  <!-- FORGOT PASSWORD MODAL -->
-  <div class="modal-overlay" id="forgot-modal">
-    <div class="modal-content">
-      <h3>🔑 Reset Password</h3>
-      <p>Enter your username, secret recovery word, and a new password.</p>
-      
-      <form onsubmit="handlePasswordReset(event)" style="display: flex; flex-direction: column; gap: 10px;">
-        <input type="text" id="forgot-user" placeholder="Username" required>
-        <input type="text" id="forgot-secret" placeholder="Secret Recovery Word" required>
-        
-        <div class="password-container">
-          <input type="password" id="forgot-new-pass" placeholder="New Password" required>
-          <button type="button" class="toggle-eye" id="eye-btn-forgot" onclick="togglePasswordVisibility('forgot-new-pass', 'eye-btn-forgot')">👁️</button>
-        </div>
-
-        <button type="submit" class="modal-btn" style="width: 100%;">Save New Password</button>
-      </form>
-      <button class="modal-btn-close" onclick="closeForgotModal()">Cancel</button>
-    </div>
-  </div>
-
   <script>
+  const firebaseConfig = {
+  apiKey: "AIzaSyD2FPl7SpLniSCgYNimRx8LGLmECIpVKck",
+  authDomain: "life-rpg-eaa3e.firebaseapp.com",
+  databaseURL: "https://life-rpg-eaa3e-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "life-rpg-eaa3e",
+  storageBucket: "life-rpg-eaa3e.firebasestorage.app",
+  messagingSenderId: "119046286545",
+  appId: "1:119046286545:web:df65b5743c19b1f7b269f0"
+};
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+
     let isRegisterMode = false;
     let currentUser = null;
-    let users = JSON.parse(localStorage.getItem('lifeRPG_users')) || {};
+    let userData = null;
 
     let defaultUserData = {
       xp: 0,
@@ -268,6 +265,39 @@
       ]
     };
 
+    // AUTH STATE LISTENERS (AUTOMATIC CLOUD LOGIN)
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('user-display').innerText = user.email.split('@')[0];
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'block';
+
+        // Load data from Realtime Database
+        const snapshot = await database.ref('users/' + user.uid).once('value');
+        if (snapshot.exists()) {
+          userData = snapshot.val();
+          if (!userData.quests) userData.quests = [];
+          if (!userData.goals) userData.goals = [];
+          if (!userData.shop) userData.shop = [];
+        } else {
+          userData = JSON.parse(JSON.stringify(defaultUserData));
+          await database.ref('users/' + user.uid).set(userData);
+        }
+
+        render();
+
+        if (!userData.hasSeenTutorial) {
+          startTutorial();
+        }
+      } else {
+        currentUser = null;
+        userData = null;
+        document.getElementById('app-screen').style.display = 'none';
+        document.getElementById('auth-screen').style.display = 'flex';
+      }
+    });
+
     // TOGGLE PASSWORD EYE
     function togglePasswordVisibility(inputId, btnId) {
       const input = document.getElementById(inputId);
@@ -285,110 +315,50 @@
     function toggleAuthMode() {
       isRegisterMode = !isRegisterMode;
       document.getElementById('auth-title').innerText = isRegisterMode ? '✨ Create Account' : '🎮 Welcome to Life RPG';
-      document.getElementById('auth-sub').innerText = isRegisterMode ? 'Choose a username, password & secret word' : 'Log in to continue your adventure';
+      document.getElementById('auth-sub').innerText = isRegisterMode ? 'Register with email & password' : 'Log in with your email to continue';
       document.getElementById('auth-submit-btn').innerText = isRegisterMode ? 'Register' : 'Login';
       document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? 'Already have an account? Login' : 'Need an account? Register here';
-      
-      document.getElementById('secret-word-container').style.display = isRegisterMode ? 'block' : 'none';
-      document.getElementById('auth-secret').required = isRegisterMode;
     }
 
-    function handleAuth(e) {
+    async function handleAuth(e) {
       e.preventDefault();
-      const u = document.getElementById('auth-user').value.trim().toLowerCase();
-      const p = document.getElementById('auth-pass').value.trim();
-      const secret = document.getElementById('auth-secret').value.trim().toLowerCase();
+      const email = document.getElementById('auth-email').value.trim();
+      const pass = document.getElementById('auth-pass').value.trim();
 
-      if (!u || !p) return;
-
-      if (isRegisterMode) {
-        if (users[u]) {
-          alert('Username already exists!');
-          return;
-        }
-        if (!secret) {
-          alert('Please enter a secret recovery word for forgotten passwords!');
-          return;
-        }
-        users[u] = { 
-          password: p, 
-          secretWord: secret,
-          data: JSON.parse(JSON.stringify(defaultUserData)) 
-        };
-        saveUsers();
-        loginUser(u);
-      } else {
-        if (users[u] && users[u].password === p) {
-          loginUser(u);
+      try {
+        if (isRegisterMode) {
+          await auth.createUserWithEmailAndPassword(email, pass);
+          showToast('Account created! Welcome!');
         } else {
-          alert('Invalid username or password!');
+          await auth.signInWithEmailAndPassword(email, pass);
+          showToast('Welcome back!');
         }
+      } catch (err) {
+        alert('Authentication Error: ' + err.message);
       }
     }
 
-    function openForgotModal() {
-      document.getElementById('forgot-modal').style.display = 'flex';
-    }
-
-    function closeForgotModal() {
-      document.getElementById('forgot-modal').style.display = 'none';
-    }
-
-    function handlePasswordReset(e) {
-      e.preventDefault();
-      const u = document.getElementById('forgot-user').value.trim().toLowerCase();
-      const secret = document.getElementById('forgot-secret').value.trim().toLowerCase();
-      const newPass = document.getElementById('forgot-new-pass').value.trim();
-
-      if (!users[u]) {
-        alert('User does not exist!');
-        return;
-      }
-
-      if (users[u].secretWord && users[u].secretWord.toLowerCase() === secret) {
-        users[u].password = newPass;
-        saveUsers();
-        alert('Password updated successfully! You can now log in.');
-        closeForgotModal();
-      } else {
-        alert('Incorrect secret recovery word or no secret word was set for this account.');
-      }
-    }
-
-    function loginUser(username) {
-      currentUser = username;
-      localStorage.setItem('lifeRPG_activeUser', username);
-      document.getElementById('user-display').innerText = username;
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('app-screen').style.display = 'block';
-      
-      render();
-
-      if (!getUserData().hasSeenTutorial) {
-        startTutorial();
+    async function sendPasswordReset() {
+      const email = prompt('Enter your email address to receive a password reset link:');
+      if (email) {
+        try {
+          await auth.sendPasswordResetEmail(email.trim());
+          alert('Password reset email sent! Check your inbox.');
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
       }
     }
 
     function logout() {
-      currentUser = null;
-      localStorage.removeItem('lifeRPG_activeUser');
-      document.getElementById('app-screen').style.display = 'none';
-      document.getElementById('auth-screen').style.display = 'flex';
-      document.getElementById('auth-user').value = '';
-      document.getElementById('auth-pass').value = '';
+      auth.signOut();
     }
 
-    function getUserData() {
-      return users[currentUser].data;
-    }
-
-    function save() {
-      saveUsers();
+    async function save() {
+      if (currentUser && userData) {
+        await database.ref('users/' + currentUser.uid).set(userData);
+      }
       render();
-    }
-
-    function saveUsers() {
-      localStorage.setItem('lifeRPG_users', JSON.stringify(users));
     }
 
     // TUTORIAL SYSTEM
@@ -418,7 +388,7 @@
         showTutStep();
       } else {
         document.getElementById('tutorial-modal').style.display = 'none';
-        getUserData().hasSeenTutorial = true;
+        userData.hasSeenTutorial = true;
         save();
       }
     }
@@ -454,21 +424,21 @@
     }
 
     function render() {
-      if (!currentUser) return;
-      const data = getUserData();
-      const maxXp = data.level * 100;
+      if (!userData) return;
+      const maxXp = userData.level * 100;
 
-      document.getElementById('level').innerText = `Lvl ${data.level}`;
-      document.getElementById('gold').innerText = data.gold;
-      document.getElementById('current-xp').innerText = data.xp;
+      document.getElementById('level').innerText = `Lvl ${userData.level}`;
+      document.getElementById('gold').innerText = userData.gold;
+      document.getElementById('current-xp').innerText = userData.xp;
       document.getElementById('max-xp').innerText = maxXp;
-      document.getElementById('xp-bar').style.width = `${Math.min((data.xp / maxXp) * 100, 100)}%`;
+      document.getElementById('xp-bar').style.width = `${Math.min((userData.xp / maxXp) * 100, 100)}%`;
 
       // Render Quests
       const questList = document.getElementById('quest-list');
-      questList.innerHTML = data.quests.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No active quests.</p>' : '';
+      const quests = userData.quests || [];
+      questList.innerHTML = quests.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No active quests.</p>' : '';
       
-      data.quests.forEach(q => {
+      quests.forEach(q => {
         let actionButtons = '';
         let extraBadge = '';
 
@@ -503,8 +473,9 @@
 
       // Render Goals
       const goalList = document.getElementById('goal-list');
-      goalList.innerHTML = data.goals.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No major goals set.</p>' : '';
-      data.goals.forEach(g => {
+      const goals = userData.goals || [];
+      goalList.innerHTML = goals.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No major goals set.</p>' : '';
+      goals.forEach(g => {
         goalList.innerHTML += `
           <div class="card goal-card">
             <div class="card-info">
@@ -521,8 +492,9 @@
 
       // Render Shop
       const shopList = document.getElementById('shop-list');
-      shopList.innerHTML = data.shop.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No rewards in shop.</p>' : '';
-      data.shop.forEach(s => {
+      const shop = userData.shop || [];
+      shopList.innerHTML = shop.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No rewards in shop.</p>' : '';
+      shop.forEach(s => {
         shopList.innerHTML += `
           <div class="card">
             <div class="card-info">
@@ -551,7 +523,8 @@
       if (type === 'counter') { newQuest.current = 0; newQuest.target = targetVal; }
       else if (type === 'timer') { newQuest.targetSeconds = targetVal * 60; newQuest.remainingSeconds = targetVal * 60; newQuest.isRunning = false; }
 
-      getUserData().quests.push(newQuest);
+      if (!userData.quests) userData.quests = [];
+      userData.quests.push(newQuest);
       document.getElementById('quest-title').value = '';
       save();
     }
@@ -562,13 +535,14 @@
       const xp = parseInt(document.getElementById('goal-xp').value);
       const gold = Math.round(xp / 2.5);
 
-      getUserData().goals.push({ id: Date.now(), title, xp, gold });
+      if (!userData.goals) userData.goals = [];
+      userData.goals.push({ id: Date.now(), title, xp, gold });
       document.getElementById('goal-title').value = '';
       save();
     }
 
     function incrementCounter(id) {
-      const q = getUserData().quests.find(item => item.id === id);
+      const q = userData.quests.find(item => item.id === id);
       if (!q) return;
       q.current += 1;
       if (q.current >= q.target) completeQuest(id);
@@ -576,7 +550,7 @@
     }
 
     function decrementCounter(id) {
-      const q = getUserData().quests.find(item => item.id === id);
+      const q = userData.quests.find(item => item.id === id);
       if (!q) return;
       if (q.current > 0) {
         q.current -= 1;
@@ -586,75 +560,72 @@
     }
 
     function toggleTimer(id) {
-      const q = getUserData().quests.find(item => item.id === id);
+      const q = userData.quests.find(item => item.id === id);
       if (!q) return;
       q.isRunning = !q.isRunning;
       save();
     }
 
     function addRewards(xpGained, goldGained) {
-      const data = getUserData();
-      data.xp += xpGained;
-      data.gold += goldGained;
+      userData.xp += xpGained;
+      userData.gold += goldGained;
 
-      let maxXp = data.level * 100;
+      let maxXp = userData.level * 100;
       let levelUps = 0;
-      while (data.xp >= maxXp) {
-        data.xp -= maxXp;
-        data.level += 1;
+      while (userData.xp >= maxXp) {
+        userData.xp -= maxXp;
+        userData.level += 1;
         levelUps++;
-        maxXp = data.level * 100;
+        maxXp = userData.level * 100;
       }
 
-      if (levelUps > 0) showToast(`🎉 LEVEL UP! Level ${data.level}! 🎉`);
+      if (levelUps > 0) showToast(`🎉 LEVEL UP! Level ${userData.level}! 🎉`);
       else showToast(`+${xpGained} XP | +${goldGained} Gold!`);
     }
 
     function completeQuest(id) {
-      const data = getUserData();
-      const quest = data.quests.find(q => q.id === id);
+      const quest = userData.quests.find(q => q.id === id);
       if (!quest) return;
       addRewards(quest.xp, quest.gold);
-      data.quests = data.quests.filter(q => q.id !== id);
+      userData.quests = userData.quests.filter(q => q.id !== id);
       save();
     }
 
     function completeGoal(id) {
-      const data = getUserData();
-      const goal = data.goals.find(g => g.id === id);
+      const goal = userData.goals.find(g => g.id === id);
       if (!goal) return;
       if (confirm(`Completed: "${goal.title}"?`)) {
         addRewards(goal.xp, goal.gold);
-        data.goals = data.goals.filter(g => g.id !== id);
+        userData.goals = userData.goals.filter(g => g.id !== id);
         save();
       }
     }
 
-    function deleteQuest(id) { getUserData().quests = getUserData().quests.filter(q => q.id !== id); save(); }
-    function deleteGoal(id) { getUserData().goals = getUserData().goals.filter(g => g.id !== id); save(); }
+    function deleteQuest(id) { userData.quests = userData.quests.filter(q => q.id !== id); save(); }
+    function deleteGoal(id) { userData.goals = userData.goals.filter(g => g.id !== id); save(); }
 
     function addShopItem(e) {
       e.preventDefault();
       const title = document.getElementById('item-title').value;
       const cost = parseInt(document.getElementById('item-cost').value);
-      getUserData().shop.push({ id: Date.now(), title, cost });
+      if (!userData.shop) userData.shop = [];
+      userData.shop.push({ id: Date.now(), title, cost });
       document.getElementById('item-title').value = '';
       document.getElementById('item-cost').value = '';
       save();
     }
 
     function buyItem(id) {
-      const data = getUserData();
-      const item = data.shop.find(s => s.id === id);
+      const item = userData.shop.find(s => s.id === id);
       if (!item) return;
-      if (data.gold >= item.cost) {
-        data.gold -= item.cost;
+      if (userData.gold >= item.cost) {
+        userData.gold -= item.cost;
         showToast(`Bought: ${item.title}! 🎁`);
         save();
       } else alert('Not enough gold!');
     }
 
-    function deleteShopItem(id) { getUserData().shop = getUserData().shop.filter(s => s.id !== id); save(); }
+    function deleteShopItem(id) { userData.shop = userData.shop.filter(s => s.id !== id); save(); }
 
     function showToast(msg) {
       const toast = document.getElementById('toast');
@@ -665,8 +636,8 @@
 
     // TIMER INTERVAL
     setInterval(() => {
-      if (!currentUser) return;
-      getUserData().quests.forEach(q => {
+      if (!userData || !userData.quests) return;
+      userData.quests.forEach(q => {
         if (q.type === 'timer' && q.isRunning) {
           if (q.remainingSeconds > 0) {
             q.remainingSeconds--;
@@ -679,12 +650,6 @@
         }
       });
     }, 1000);
-
-    // AUTO-LOGIN CHECK
-    const activeUser = localStorage.getItem('lifeRPG_activeUser');
-    if (activeUser && users[activeUser]) {
-      loginUser(activeUser);
-    }
   </script>
 </body>
 </html>
