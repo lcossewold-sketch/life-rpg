@@ -216,9 +216,9 @@
             <option value="250">250 XP</option>
           </select>
         </div>
-        <!-- Invoerveld voor de Optionele Deadline -->
+        <!-- Invoerveld voor de Optionele Deadline (TEXT-TO-DATE HACK) -->
         <div class="form-row">
-          <input type="datetime-local" id="quest-due" placeholder="Set deadline (optional)" style="width: 100%; flex: 1; color: #ffffff !important; background-color: #121214 !important; color-scheme: dark; font-size: 0.85rem;" onfocus="this.showPicker && this.showPicker()">
+          <input type="text" id="quest-due" placeholder="🗓️ Set deadline (optional)..." onfocus="(this.type='datetime-local')" onblur="if(!this.value) this.type='text'" style="width: 100%; flex: 1; color: #ffffff !important; background-color: #121214 !important; color-scheme: dark; font-size: 0.85rem;">
           <button type="submit" class="btn-add">+</button>
         </div>
       </form>
