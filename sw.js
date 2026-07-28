@@ -1,41 +1,54 @@
-const CACHE_NAME = 'life-rpg-v6';
+const CACHE_NAME = 'life-rpg-v2';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json'
 ];
 
-// Installeren van de Service Worker
+// Installeren van Service Worker
 self.addEventListener('install', (e) => {
-  self.skipWaiting(); // Dwingt de nieuwe Service Worker om direct actief te worden
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS);
     })
   );
+  self.skipWaiting();
 });
 
-// Activeren en OUDE cache opruimen!
+// Activeren en oude caches opruimen
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log('Oude cache verwijderd:', key);
-            return caches.delete(key); // Verwijdert oude v1 cache
+            return caches.delete(key);
           }
         })
       );
-    }).then(() => self.clients.claim())
+    })
+  );
+  self.clients.claim();
+});
+
+// Ophalen van bestanden
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    caches.match(e.request).then((res) => {
+      return res || fetch(e.request);
+    })
   );
 });
 
-// Bestanden ophalen
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      return cachedResponse || fetch(e.request);
+// Klikken op een mobiele notificatie opent/focust de app
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      if (clientList.length > 0) {
+        return clientList[0].focus();
+      }
+      return clients.openWindow('/');
     })
   );
 });
