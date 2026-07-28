@@ -97,16 +97,13 @@
     input, select { background: #121214; border: 1px solid #2d2d35; color: var(--text); padding: 10px; border-radius: 8px; outline: none; font-size: 0.9rem; }
     input[type="text"], input[type="email"], input[type="password"] { flex: 1; }
     
-    /* Datumkiezer styling speciaal voor mobiele telefoons */
+    /* Styling voor datum-invoerveld */
     input[type="datetime-local"] { 
       color: #ffffff !important; 
-      background-color: #121214 !important;
+      background-color: #2d2d35 !important;
+      border: 1px solid #3f3f46 !important;
       color-scheme: dark;
       font-size: 0.85rem;
-    }
-    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-      cursor: pointer;
     }
 
     .btn-add { background: var(--success); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
@@ -216,10 +213,14 @@
             <option value="250">250 XP</option>
           </select>
         </div>
-        <!-- Invoerveld voor de Optionele Deadline (TEXT-TO-DATE HACK) -->
-        <div class="form-row">
-          <input type="text" id="quest-due" placeholder="🗓️ Set deadline (optional)..." onfocus="(this.type='datetime-local')" onblur="if(!this.value) this.type='text'" style="width: 100%; flex: 1; color: #ffffff !important; background-color: #121214 !important; color-scheme: dark; font-size: 0.85rem;">
-          <button type="submit" class="btn-add">+</button>
+
+        <!-- Duidelijk gelabeld datumveld -->
+        <div style="margin-top: 2px;">
+          <label for="quest-due" style="font-size: 0.8rem; color: var(--subtext); display: block; margin-bottom: 4px;">⏰ Deadline (optional):</label>
+          <div class="form-row">
+            <input type="datetime-local" id="quest-due" style="width: 100%; flex: 1;">
+            <button type="submit" class="btn-add">+</button>
+          </div>
         </div>
       </form>
       <div class="list" id="quest-list"></div>
@@ -414,7 +415,7 @@
     // TUTORIAL SYSTEM
     let tutStep = 0;
     const tutSteps = [
-      { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily tasks, level up, earn gold, and unlock real-life rewards." },
+      { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily tasks, level up, earn gold, and reward yourself." },
       { title: "⚔️ Quests", body: "Add daily habits or tasks. Set deadlines, counters, or timers! Complete them on time to earn XP and Gold." },
       { title: "🎯 Goals", body: "Set big, long-term achievements (like passing an exam or losing weight). These give massive XP and Gold bonuses!" },
       { title: "🛒 The Shop", body: "Use your hard-earned Gold to buy real-life rewards you create (e.g., 1 hour of gaming, watching a movie, or a treat)." }
