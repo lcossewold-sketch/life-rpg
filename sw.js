@@ -1,4 +1,4 @@
-const CACHE_NAME = 'life-rpg-v3'; // ⚠️ INCREMENT THIS NUMBER WITH EVERY UPDATE (e.g. v3, v4, v5)!
+const CACHE_NAME = 'life-rpg-v4'; // ⚠️ INCREMENT THIS NUMBER WITH EVERY UPDATE (e.g. v4, v5)!
 
 const ASSETS_TO_CACHE = [
   './',
