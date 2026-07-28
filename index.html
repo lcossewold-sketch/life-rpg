@@ -79,7 +79,7 @@
     .xp-text { font-size: 0.8rem; color: var(--subtext); text-align: right; }
 
     /* Buttons in Header */
-    .header-btns { display: flex; gap: 8px; }
+    .header-btns { display: flex; gap: 6px; }
     .icon-btn { background: #2d2d35; border: none; color: var(--text); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
 
     /* Tabs */
@@ -172,6 +172,7 @@
       <div class="top-bar">
         <span>Hero: <strong id="user-display" style="color: var(--text);">Player</strong></span>
         <div class="header-btns">
+          <button class="icon-btn" onclick="requestNotificationPermission()">🔔 Meldingen</button>
           <button class="icon-btn" onclick="startTutorial()">❓ Help</button>
           <button class="icon-btn" onclick="logout()">🚪 Logout</button>
         </div>
@@ -302,6 +303,40 @@
       } else {
         input.type = 'password';
         btn.innerText = '👁️';
+      }
+    }
+
+    // NOTIFICATIES EN MELDINGEN
+    function requestNotificationPermission() {
+      if (!('Notification' in window)) {
+        alert('Je browser ondersteunt helaas geen mobiele notificaties.');
+        return;
+      }
+
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          showToast('🔔 Meldingen staan nu AAN!');
+          sendNotification('🎮 Life RPG', 'Meldingen zijn succesvol ingeschakeld!');
+        } else if (permission === 'denied') {
+          alert('Je hebt meldingen geblokkeerd. Zet dit aan via je browserinstellingen.');
+        }
+      });
+    }
+
+    function sendNotification(title, body) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification(title, {
+              body: body,
+              icon: 'https://cdn-icons-png.flaticon.com/512/3408/3408506.png',
+              vibrate: [200, 100, 200],
+              tag: 'life-rpg-notification'
+            });
+          });
+        } else {
+          new Notification(title, { body: body });
+        }
       }
     }
 
@@ -578,7 +613,7 @@
       const targetVal = parseInt(document.getElementById('quest-target').value) || 1;
       const dueVal = document.getElementById('quest-due').value;
 
-      const newQuest = { id: Date.now(), title, type, xp, gold };
+      const newQuest = { id: Date.now(), title, type, xp, gold, warned: false };
       if (dueVal) newQuest.dueDate = dueVal;
       if (type === 'counter') { newQuest.current = 0; newQuest.target = targetVal; }
       else if (type === 'timer') { newQuest.targetSeconds = targetVal * 60; newQuest.remainingSeconds = targetVal * 60; newQuest.isRunning = false; }
@@ -695,18 +730,28 @@
       setTimeout(() => toast.style.display = 'none', 3000);
     }
 
-    // INTERVAL VOOR TIMERS EN OVERDUE QUESTS
+    // INTERVAL VOOR TIMERS, DEADLINES EN NOTIFICATIES
     setInterval(() => {
       if (!userData || !userData.quests) return;
       const now = new Date().getTime();
       let hasChanges = false;
 
-      // Controleer op verlopen deadlines
       userData.quests = userData.quests.filter(q => {
         if (q.dueDate) {
           const dueTime = new Date(q.dueDate).getTime();
+          const timeLeft = dueTime - now;
+
+          // ⚠️ Minder dan 15 minuten over -> stuur notificatie
+          if (timeLeft > 0 && timeLeft <= 15 * 60 * 1000 && !q.warned) {
+            q.warned = true;
+            hasChanges = true;
+            sendNotification('⏰ Deadline Nabij!', `Je hebt nog minder dan 15 minuten voor: "${q.title}"!`);
+          }
+
+          // ❌ Verlopen deadline
           if (now >= dueTime) {
-            showToast(`❌ Quest expired: "${q.title}"! No rewards given.`);
+            showToast(`❌ Quest expired: "${q.title}"!`);
+            sendNotification('❌ Quest Verlopen', `De deadline voor "${q.title}" is verstreken.`);
             hasChanges = true;
             return false;
           }
@@ -714,7 +759,7 @@
         return true;
       });
 
-      // Update actieve timers
+      // Timers bijwerken
       userData.quests.forEach(q => {
         if (q.type === 'timer' && q.isRunning) {
           if (q.remainingSeconds > 0) {
@@ -723,6 +768,7 @@
             if (disp) disp.innerText = `⏱️ ${formatTime(q.remainingSeconds)}`;
           } else {
             q.isRunning = false;
+            sendNotification('⏱️ Timer Afgelopen!', `De timer voor "${q.title}" is klaar!`);
             completeQuest(q.id);
           }
         }
@@ -732,13 +778,23 @@
     }, 1000);
   </script>
 
-  <!-- PWA SERVICE WORKER REGISTRATIE -->
+  <!-- PWA SERVICE WORKER REGISTRATIE EN UPDATE DETECTIE -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('Service Worker geregistreerd!', reg))
-          .catch(err => console.log('Service Worker fout:', err));
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+          console.log('Service Worker geregistreerd!', reg);
+
+          // Luister naar updates van de app
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                sendNotification('🚀 Nieuwe App Update!', 'Er is een nieuwe versie van Life RPG beschikbaar. Herlaad je pagina!');
+              }
+            });
+          });
+        }).catch(err => console.log('Service Worker fout:', err));
       });
     }
   </script>
