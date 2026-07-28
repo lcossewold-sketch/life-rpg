@@ -1,65 +1,53 @@
-const CACHE_NAME = 'life-rpg-v3';
-const ASSETS = [
+// Verander 'v1' naar 'v2', 'v3', etc. wanneer je een update op GitHub zet!
+const CACHE_NAME = 'life-rpg-v2';
+
+const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json',
-  'https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js',
-  'https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js',
-  'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js',
-  'https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js'
+  './manifest.json'
 ];
 
-// Installeren & Bestanden Cachen
-self.addEventListener('install', (e) => {
-  e.waitUntil(
+// Installatie
+self.addEventListener('install', (event) => {
+  event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] Caching app assets & CDNs');
-      return cache.addAll(ASSETS);
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
-  self.skipWaiting();
 });
 
-// Activeren & Oude Cache Verwijderen
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) => {
+// Luister naar het 'skipWaiting' signaal van de app
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});
+
+// Activatie: Verwijder OUDE caches automatisch
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log('Oude cache opgeruimd:', cache);
+            return caches.delete(cache);
           }
         })
       );
-    })
-  );
-  self.clients.claim();
-});
-
-// Offline-First Netwerk Strategie (Eerst cache, anders netwerk)
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(e.request).catch(() => {
-        // Als zowel de cache als het netwerk niet werken (offline)
-        console.log('[Service Worker] Offline request failed:', e.request.url);
-      });
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// Klikken op Notificatie
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      if (clientList.length > 0) {
-        return clientList[0].focus();
-      }
-      return clients.openWindow('/');
-    })
+// Netwerk-eerst strategie (haalt altijd nieuwste versie op als er internet is)
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        return networkResponse;
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
   );
 });
