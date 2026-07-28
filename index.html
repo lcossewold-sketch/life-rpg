@@ -69,6 +69,7 @@
     /* Stats Header */
     .header { background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #2d2d35; position: relative; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; color: var(--subtext); }
+    .status-tag { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background: #2d2d35; margin-left: 6px; }
     .profile { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .level-badge { background: var(--accent); color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; }
     .currency { color: var(--accent-gold); font-weight: bold; font-size: 1.1rem; }
@@ -170,7 +171,7 @@
   <div id="app-screen">
     <div class="header">
       <div class="top-bar">
-        <span>Hero: <strong id="user-display" style="color: var(--text);">Player</strong></span>
+        <span>Hero: <strong id="user-display" style="color: var(--text);">Player</strong> <span id="network-status" class="status-tag">🟢 Online</span></span>
         <div class="header-btns">
           <button class="icon-btn" onclick="requestNotificationPermission()">🔔 Meldingen</button>
           <button class="icon-btn" onclick="startTutorial()">❓ Help</button>
@@ -215,7 +216,6 @@
           </select>
         </div>
 
-        <!-- Duidelijk gelabeld datumveld -->
         <div style="margin-top: 2px;">
           <label for="quest-due" style="font-size: 0.8rem; color: var(--subtext); display: block; margin-bottom: 4px;">⏰ Deadline (optional):</label>
           <div class="form-row">
@@ -270,8 +270,23 @@
   </div>
 
   <script>
-    // GLOBAL UI FUNCTIONS
+    // GLOBAL UI & NETWORK MONITORING
     let isRegisterMode = false;
+
+    function updateNetworkStatus() {
+      const statusTag = document.getElementById('network-status');
+      if (navigator.onLine) {
+        statusTag.innerText = '🟢 Online';
+        statusTag.style.color = '#10b981';
+        syncDataWithCloud(); // Automatisch synchroniseren zodra we weer internet hebben!
+      } else {
+        statusTag.innerText = '🔴 Offline';
+        statusTag.style.color = '#ef4444';
+      }
+    }
+
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
 
     function toggleAuthMode() {
       isRegisterMode = !isRegisterMode;
@@ -285,7 +300,7 @@
       const email = prompt('Enter your email address to receive a password reset link:');
       if (email) {
         if (typeof auth === 'undefined' || !auth) {
-          alert('Firebase is not initialized! Please check your Firebase Config keys in index.html.');
+          alert('Firebase is not initialized!');
           return;
         }
         auth.sendPasswordResetEmail(email.trim())
@@ -306,7 +321,7 @@
       }
     }
 
-    // NOTIFICATIES EN MELDINGEN
+    // MELDINGEN
     function requestNotificationPermission() {
       if (!('Notification' in window)) {
         alert('Je browser ondersteunt helaas geen mobiele notificaties.');
@@ -340,6 +355,7 @@
       }
     }
 
+    // FIREBASE INITIALISATIE
     const firebaseConfig = {
       apiKey: "AIzaSyD2FPl7SpLniSCgYNimRx8LGLmECIpVKck",
       authDomain: "life-rpg-eaa3e.firebaseapp.com",
@@ -350,12 +366,14 @@
       appId: "1:119046286545:web:df65b5743c19b1f7b269f0"
     };
 
-    // Firebase Initialiseren
     let auth, database;
     try {
       firebase.initializeApp(firebaseConfig);
       auth = firebase.auth();
       database = firebase.database();
+      
+      // Zorg dat de login-status offline behouden blijft op het apparaat
+      auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch (e) {
       console.error("Firebase config fout:", e);
     }
@@ -380,45 +398,75 @@
       ]
     };
 
+    // OPSTARTEN & DUAL-STORAGE LOGICA (OFFLINE FIRST)
+    function loadLocalData() {
+      const saved = localStorage.getItem('lifeRpgUserData');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) { console.error('Fout bij laden van local data', e); }
+      }
+      return null;
+    }
+
+    // Probeer direct lokaal te laden zodat de app METEEN opent (ook zonder internet)
+    const cachedLocal = loadLocalData();
+    if (cachedLocal) {
+      userData = cachedLocal;
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('app-screen').style.display = 'block';
+      render();
+    }
+
     if (auth) {
       auth.onAuthStateChanged(async (user) => {
+        updateNetworkStatus();
         if (user) {
           currentUser = user;
           document.getElementById('user-display').innerText = user.email.split('@')[0];
           document.getElementById('auth-screen').style.display = 'none';
           document.getElementById('app-screen').style.display = 'block';
 
-          const snapshot = await database.ref('users/' + user.uid).once('value');
-          if (snapshot.exists()) {
-            userData = snapshot.val();
-            if (!userData.quests) userData.quests = [];
-            if (!userData.goals) userData.goals = [];
-            if (!userData.shop) userData.shop = [];
-          } else {
-            userData = JSON.parse(JSON.stringify(defaultUserData));
-            await database.ref('users/' + user.uid).set(userData);
+          // Als we online zijn, halen we de nieuwste data op uit de Firebase Cloud
+          if (navigator.onLine) {
+            try {
+              const snapshot = await database.ref('users/' + user.uid).once('value');
+              if (snapshot.exists()) {
+                userData = snapshot.val();
+                if (!userData.quests) userData.quests = [];
+                if (!userData.goals) userData.goals = [];
+                if (!userData.shop) userData.shop = [];
+              } else if (!userData) {
+                userData = JSON.parse(JSON.stringify(defaultUserData));
+                await database.ref('users/' + user.uid).set(userData);
+              }
+            } catch (err) {
+              console.log('Kon clouddata niet ophalen, we gebruiken lokale data.');
+            }
           }
 
+          if (!userData) userData = JSON.parse(JSON.stringify(defaultUserData));
+          saveLocally();
           render();
 
           if (!userData.hasSeenTutorial) {
             startTutorial();
           }
         } else {
-          currentUser = null;
-          userData = null;
-          document.getElementById('app-screen').style.display = 'none';
-          document.getElementById('auth-screen').style.display = 'flex';
+          // Als er geen gecachte sessie/lokale data is, toon inlogscherm
+          if (!cachedLocal) {
+            currentUser = null;
+            userData = null;
+            document.getElementById('app-screen').style.display = 'none';
+            document.getElementById('auth-screen').style.display = 'flex';
+          }
         }
       });
     }
 
     async function handleAuth(e) {
       e.preventDefault();
-      if (!auth) {
-        alert("Firebase Config keys represent missing or invalid!");
-        return;
-      }
+      if (!auth) { alert("Firebase is niet geïnitialiseerd!"); return; }
 
       const email = document.getElementById('auth-email').value.trim();
       const pass = document.getElementById('auth-pass').value.trim();
@@ -437,13 +485,31 @@
     }
 
     function logout() {
+      localStorage.removeItem('lifeRpgUserData');
       if (auth) auth.signOut();
+      window.location.reload();
     }
 
-    async function save() {
-      if (currentUser && userData && database) {
-        await database.ref('users/' + currentUser.uid).set(userData);
+    function saveLocally() {
+      if (userData) {
+        localStorage.setItem('lifeRpgUserData', JSON.stringify(userData));
       }
+    }
+
+    async function syncDataWithCloud() {
+      if (currentUser && userData && database && navigator.onLine) {
+        try {
+          await database.ref('users/' + currentUser.uid).set(userData);
+          console.log('Cloud-synchronisatie voltooid!');
+        } catch (e) {
+          console.error('Cloud-sync mislukt:', e);
+        }
+      }
+    }
+
+    function save() {
+      saveLocally();      // 1. Altijd direct lokaal opslaan (bliksemsnel)
+      syncDataWithCloud(); // 2. Synchroniseren met Firebase als er Wi-Fi is
       render();
     }
 
@@ -730,7 +796,7 @@
       setTimeout(() => toast.style.display = 'none', 3000);
     }
 
-    // INTERVAL VOOR TIMERS, DEADLINES EN NOTIFICATIES
+    // INTERVAL VOOR TIMERS, DEADLINES EN MELDINGEN
     setInterval(() => {
       if (!userData || !userData.quests) return;
       const now = new Date().getTime();
@@ -741,14 +807,14 @@
           const dueTime = new Date(q.dueDate).getTime();
           const timeLeft = dueTime - now;
 
-          // ⚠️ Minder dan 15 minuten over -> stuur notificatie
+          // Minder dan 15 minuten over
           if (timeLeft > 0 && timeLeft <= 15 * 60 * 1000 && !q.warned) {
             q.warned = true;
             hasChanges = true;
             sendNotification('⏰ Deadline Nabij!', `Je hebt nog minder dan 15 minuten voor: "${q.title}"!`);
           }
 
-          // ❌ Verlopen deadline
+          // Verlopen deadline
           if (now >= dueTime) {
             showToast(`❌ Quest expired: "${q.title}"!`);
             sendNotification('❌ Quest Verlopen', `De deadline voor "${q.title}" is verstreken.`);
@@ -778,14 +844,13 @@
     }, 1000);
   </script>
 
-  <!-- PWA SERVICE WORKER REGISTRATIE EN UPDATE DETECTIE -->
+  <!-- PWA SERVICE WORKER REGISTRATIE -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then(reg => {
           console.log('Service Worker geregistreerd!', reg);
 
-          // Luister naar updates van de app
           reg.addEventListener('updatefound', () => {
             const newWorker = reg.installing;
             newWorker.addEventListener('statechange', () => {
