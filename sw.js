@@ -1,5 +1,4 @@
-// Verander 'v1' naar 'v2', 'v3', etc. wanneer je een update op GitHub zet!
-const CACHE_NAME = 'life-rpg-v2';
+const CACHE_NAME = 'life-rpg-v2'; // ⚠️ VERHOOG DIT NUMMER BIJ ELKE UPDATE (bijv. v3, v4, v5)!
 
 const ASSETS_TO_CACHE = [
   './',
@@ -7,8 +6,9 @@ const ASSETS_TO_CACHE = [
   './manifest.json'
 ];
 
-// Installatie
+// 1. Installatie: Forceer de nieuwe worker
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);
@@ -16,14 +16,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Luister naar het 'skipWaiting' signaal van de app
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.action === 'skipWaiting') {
-    self.skipWaiting();
-  }
-});
-
-// Activatie: Verwijder OUDE caches automatisch
+// 2. Activatie: Verwijder DIRECT alle oude caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -39,15 +32,24 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Netwerk-eerst strategie (haalt altijd nieuwste versie op als er internet is)
+// 3. Network-First Strategie: Altijd eerst de nieuwste versie van internet halen
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
-      .then((networkResponse) => {
-        return networkResponse;
+      .then((response) => {
+        const resClone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, resClone);
+        });
+        return response;
       })
-      .catch(() => {
-        return caches.match(event.request);
-      })
+      .catch(() => caches.match(event.request)) // Offline fallback
   );
+});
+
+// 4. Luister naar het signaal om te verversen
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
 });
