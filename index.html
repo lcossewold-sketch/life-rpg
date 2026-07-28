@@ -60,10 +60,11 @@
     #app-screen { display: none; }
 
     .header { background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #2d2d35; position: relative; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; color: var(--subtext); }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.85rem; color: var(--subtext); }
     .status-tag { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background: #2d2d35; margin-left: 6px; }
     .profile { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .level-badge { background: var(--accent); color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; }
+    .level-badge { background: var(--accent); color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; display: inline-block; }
+    .user-title { font-size: 0.85rem; color: var(--accent-gold); font-weight: bold; margin-top: 4px; }
     .currency { color: var(--accent-gold); font-weight: bold; font-size: 1.1rem; }
 
     .progress-container { background: #2d2d35; border-radius: 10px; height: 16px; width: 100%; overflow: hidden; margin-bottom: 6px; }
@@ -169,10 +170,15 @@
           <button class="icon-btn" onclick="logout()">🚪 Logout</button>
         </div>
       </div>
+
       <div class="profile">
-        <div class="level-badge" id="level">Lvl 1</div>
+        <div>
+          <div class="level-badge" id="level">Lvl 1</div>
+          <div class="user-title" id="user-title">🥔 Couch Potato</div>
+        </div>
         <div class="currency">🪙 <span id="gold">0</span> Gold</div>
       </div>
+
       <div class="progress-container">
         <div class="progress-bar" id="xp-bar"></div>
       </div>
@@ -287,6 +293,25 @@
 
   <script>
     let isRegisterMode = false;
+
+    function getPlayerTitle(level) {
+      if (level >= 1000) return '🌌👑 Ultimate Life RPG God';
+      if (level >= 900)  return '👁️ Immortal Overlord';
+      if (level >= 800)  return '🌌 Celestial Architect';
+      if (level >= 700)  return '🗿 Ascended Titan';
+      if (level >= 600)  return '⚡ Demigod of Focus';
+      if (level >= 500)  return '🌟 Mythic Champion';
+      if (level >= 400)  return '👑 Lord of Discipline';
+      if (level >= 300)  return '♟️ Grand Strategist';
+      if (level >= 200)  return '🧘 Master Monk';
+      if (level >= 150)  return '🔱 Vanguard Warrior';
+      if (level >= 100)  return '🏰 Centurion of Habit';
+      if (level >= 75)   return '⚔️ Iron Will Journeyman';
+      if (level >= 50)   return '📜 Productivity Scholar';
+      if (level >= 25)   return '🛡️ Discipline Initiate';
+      if (level >= 10)   return '🗡️ Apprentice Adventurer';
+      return '🥔 Couch Potato';
+    }
 
     function updateNetworkStatus() {
       const statusTag = document.getElementById('network-status');
@@ -608,6 +633,7 @@
       const maxXp = userData.level * 100;
 
       document.getElementById('level').innerText = `Lvl ${userData.level}`;
+      document.getElementById('user-title').innerText = getPlayerTitle(userData.level);
       document.getElementById('gold').innerText = userData.gold;
       document.getElementById('current-xp').innerText = userData.xp;
       document.getElementById('max-xp').innerText = maxXp;
