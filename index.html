@@ -96,18 +96,19 @@
     .form-row { display: flex; gap: 8px; width: 100%; }
     input, select { background: #121214; border: 1px solid #2d2d35; color: var(--text); padding: 10px; border-radius: 8px; outline: none; font-size: 0.9rem; }
     input[type="text"], input[type="email"], input[type="password"] { flex: 1; }
-input[type="datetime-local"] { 
-  color: #ffffff !important; 
-  background-color: #121214 !important;
-  color-scheme: dark; /* Dwingt het mobiele kalendertje in een goed leesbare dark mode */
-  font-size: 0.85rem;
-}
+    
+    /* Datumkiezer styling speciaal voor mobiele telefoons */
+    input[type="datetime-local"] { 
+      color: #ffffff !important; 
+      background-color: #121214 !important;
+      color-scheme: dark;
+      font-size: 0.85rem;
+    }
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      cursor: pointer;
+    }
 
-/* Zorgt dat het kalender-icoontje op iPhones/Androids zichtbaar blijft */
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  cursor: pointer;
-}
     .btn-add { background: var(--success); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
     /* Item list */
@@ -215,7 +216,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
             <option value="250">250 XP</option>
           </select>
         </div>
-        <!-- Veld voor de Optionele Deadline -->
+        <!-- Invoerveld voor de Optionele Deadline -->
         <div class="form-row">
           <input type="datetime-local" id="quest-due" style="width: 100%; flex: 1;">
           <button type="submit" class="btn-add">+</button>
@@ -574,7 +575,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
       const xp = parseInt(document.getElementById('quest-xp').value);
       const gold = Math.round(xp / 2.5);
       const targetVal = parseInt(document.getElementById('quest-target').value) || 1;
-      const dueVal = document.getElementById('quest-due').value; // Ingelezen datum/tijd
+      const dueVal = document.getElementById('quest-due').value;
 
       const newQuest = { id: Date.now(), title, type, xp, gold };
       if (dueVal) newQuest.dueDate = dueVal;
@@ -706,7 +707,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
           if (now >= dueTime) {
             showToast(`❌ Quest expired: "${q.title}"! No rewards given.`);
             hasChanges = true;
-            return false; // Verwijder de quest
+            return false;
           }
         }
         return true;
