@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Zorgt dat de app op mobiel goed schaalt en eruitziet als een echte app -->
   <meta name="theme-color" content="#6366f1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,6 +29,7 @@
       --success: #10b981;
       --danger: #ef4444;
       --goal-accent: #ec4899;
+      --daily-accent: #10b981;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -44,7 +44,6 @@
     .input-label { display: block; color: var(--text); font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; margin-top: 12px; }
     .auth-card input { width: 100%; margin-bottom: 4px; }
 
-    /* Password Input with Eye Icon */
     .password-container { position: relative; width: 100%; margin-bottom: 4px; }
     .password-container input { width: 100%; padding-right: 40px; margin-bottom: 0; }
     .toggle-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--subtext); cursor: pointer; font-size: 1.1rem; }
@@ -53,20 +52,13 @@
     .auth-links { display: flex; flex-direction: column; gap: 10px; text-align: center; margin-top: 8px; }
     
     .auth-toggle, .auth-forgot { 
-      background: none; 
-      border: none; 
-      color: var(--subtext); 
-      font-size: 0.85rem; 
-      cursor: pointer; 
-      text-decoration: underline; 
-      font-family: inherit;
+      background: none; border: none; color: var(--subtext); font-size: 0.85rem; cursor: pointer; text-decoration: underline; font-family: inherit;
     }
     .auth-forgot { color: var(--accent-gold); }
 
     /* MAIN APP */
     #app-screen { display: none; }
 
-    /* Stats Header */
     .header { background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #2d2d35; position: relative; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; color: var(--subtext); }
     .status-tag { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background: #2d2d35; margin-left: 6px; }
@@ -74,21 +66,18 @@
     .level-badge { background: var(--accent); color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; }
     .currency { color: var(--accent-gold); font-weight: bold; font-size: 1.1rem; }
 
-    /* Progress bar */
     .progress-container { background: #2d2d35; border-radius: 10px; height: 16px; width: 100%; overflow: hidden; margin-bottom: 6px; }
     .progress-bar { background: linear-gradient(90deg, #4f46e5, #818cf8); height: 100%; width: 0%; transition: width 0.3s ease; }
     .xp-text { font-size: 0.8rem; color: var(--subtext); text-align: right; }
 
-    /* Buttons in Header */
     .header-btns { display: flex; gap: 6px; }
     .icon-btn { background: #2d2d35; border: none; color: var(--text); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
 
-    /* Tabs */
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-    .tab-btn { flex: 1; padding: 10px 4px; border: none; background: var(--card); color: var(--subtext); border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem; text-align: center; }
+    /* Tabs Navigation */
+    .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+    .tab-btn { flex: 1; padding: 10px 2px; border: none; background: var(--card); color: var(--subtext); border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; text-align: center; }
     .tab-btn.active { background: var(--accent); color: white; }
 
-    /* Section content */
     .section { display: none; }
     .section.active { display: block; }
 
@@ -98,7 +87,6 @@
     input, select { background: #121214; border: 1px solid #2d2d35; color: var(--text); padding: 10px; border-radius: 8px; outline: none; font-size: 0.9rem; }
     input[type="text"], input[type="email"], input[type="password"] { flex: 1; }
     
-    /* Styling voor datum-invoerveld */
     input[type="datetime-local"] { 
       color: #ffffff !important; 
       background-color: #2d2d35 !important;
@@ -113,6 +101,9 @@
     .list { display: flex; flex-direction: column; gap: 10px; }
     .card { background: var(--card); border: 1px solid #2d2d35; padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
     .card.goal-card { border-left: 4px solid var(--goal-accent); }
+    .card.daily-card { border-left: 4px solid var(--daily-accent); }
+    .card.completed-card { opacity: 0.5; filter: grayscale(50%); }
+    
     .card-info h4 { margin-bottom: 4px; font-size: 1rem; }
     .card-info p { font-size: 0.8rem; color: var(--subtext); }
     .badge-xp { color: var(--accent); font-weight: bold; font-size: 0.85rem; }
@@ -188,18 +179,37 @@
       <div class="xp-text"><span id="current-xp">0</span> / <span id="max-xp">100</span> XP</div>
     </div>
 
-    <!-- Tab Navigation -->
+    <!-- Tab Navigation met Nieuwe Dailies Tab -->
     <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('quests', this)">⚔️ Quests</button>
+      <button class="tab-btn active" onclick="switchTab('dailies', this)">📅 Dailies</button>
+      <button class="tab-btn" onclick="switchTab('quests', this)">⚔️ Quests</button>
       <button class="tab-btn" onclick="switchTab('goals', this)">🎯 Goals</button>
       <button class="tab-btn" onclick="switchTab('shop', this)">🛒 Shop</button>
     </div>
 
+    <!-- DAILIES SECTION -->
+    <div id="dailies" class="section active">
+      <form class="add-form" onsubmit="addDaily(event)">
+        <div class="form-row">
+          <input type="text" id="daily-title" placeholder="Dagelijkse gewoonte (bijv. Tanden poetsen)..." required>
+        </div>
+        <div class="form-row">
+          <select id="daily-xp" style="flex: 1;">
+            <option value="5">⚡ Klein (+5 XP / +2 Gold)</option>
+            <option value="10" selected>🌱 Normaal (+10 XP / +4 Gold)</option>
+            <option value="15">🔥 Belangrijk (+15 XP / +6 Gold)</option>
+          </select>
+          <button type="submit" class="btn-add">+</button>
+        </div>
+      </form>
+      <div class="list" id="daily-list"></div>
+    </div>
+
     <!-- QUESTS SECTION -->
-    <div id="quests" class="section active">
+    <div id="quests" class="section">
       <form class="add-form" onsubmit="addQuest(event)">
         <div class="form-row">
-          <input type="text" id="quest-title" placeholder="New daily quest..." required>
+          <input type="text" id="quest-title" placeholder="New quest/task..." required>
         </div>
         <div class="form-row">
           <select id="quest-type" onchange="toggleQuestInputs()" style="flex: 1;">
@@ -270,7 +280,6 @@
   </div>
 
   <script>
-    // GLOBAL UI & NETWORK MONITORING
     let isRegisterMode = false;
 
     function updateNetworkStatus() {
@@ -278,7 +287,7 @@
       if (navigator.onLine) {
         statusTag.innerText = '🟢 Online';
         statusTag.style.color = '#10b981';
-        syncDataWithCloud(); // Automatisch synchroniseren zodra we weer internet hebben!
+        syncDataWithCloud();
       } else {
         statusTag.innerText = '🔴 Offline';
         statusTag.style.color = '#ef4444';
@@ -321,7 +330,6 @@
       }
     }
 
-    // MELDINGEN
     function requestNotificationPermission() {
       if (!('Notification' in window)) {
         alert('Je browser ondersteunt helaas geen mobiele notificaties.');
@@ -333,7 +341,7 @@
           showToast('🔔 Meldingen staan nu AAN!');
           sendNotification('🎮 Life RPG', 'Meldingen zijn succesvol ingeschakeld!');
         } else if (permission === 'denied') {
-          alert('Je hebt meldingen geblokkeerd. Zet dit aan via je browserinstellingen.');
+          alert('Je hebt meldingen geblokkeerd.');
         }
       });
     }
@@ -371,8 +379,6 @@
       firebase.initializeApp(firebaseConfig);
       auth = firebase.auth();
       database = firebase.database();
-      
-      // Zorg dat de login-status offline behouden blijft op het apparaat
       auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch (e) {
       console.error("Firebase config fout:", e);
@@ -386,6 +392,12 @@
       level: 1,
       gold: 0,
       hasSeenTutorial: false,
+      lastResetDate: new Date().toDateString(),
+      dailies: [
+        { id: 101, title: 'Tanden poetsen 🪥', xp: 10, gold: 4, completedToday: false },
+        { id: 102, title: 'Lekker douchen 🚿', xp: 10, gold: 4, completedToday: false },
+        { id: 103, title: 'Op tijd opstaan ⏰', xp: 15, gold: 6, completedToday: false }
+      ],
       quests: [
         { id: 1, title: 'Drink 8 glasses of water', type: 'counter', current: 0, target: 8, xp: 50, gold: 20 },
         { id: 2, title: 'Clean room', type: 'simple', xp: 100, gold: 40 }
@@ -398,23 +410,20 @@
       ]
     };
 
-    // OPSTARTEN & DUAL-STORAGE LOGICA (OFFLINE FIRST)
     function loadLocalData() {
       const saved = localStorage.getItem('lifeRpgUserData');
       if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch (e) { console.error('Fout bij laden van local data', e); }
+        try { return JSON.parse(saved); } catch (e) { console.error('Fout bij laden van local data', e); }
       }
       return null;
     }
 
-    // Probeer direct lokaal te laden zodat de app METEEN opent (ook zonder internet)
     const cachedLocal = loadLocalData();
     if (cachedLocal) {
       userData = cachedLocal;
       document.getElementById('auth-screen').style.display = 'none';
       document.getElementById('app-screen').style.display = 'block';
+      checkDailyReset();
       render();
     }
 
@@ -427,12 +436,12 @@
           document.getElementById('auth-screen').style.display = 'none';
           document.getElementById('app-screen').style.display = 'block';
 
-          // Als we online zijn, halen we de nieuwste data op uit de Firebase Cloud
           if (navigator.onLine) {
             try {
               const snapshot = await database.ref('users/' + user.uid).once('value');
               if (snapshot.exists()) {
                 userData = snapshot.val();
+                if (!userData.dailies) userData.dailies = [];
                 if (!userData.quests) userData.quests = [];
                 if (!userData.goals) userData.goals = [];
                 if (!userData.shop) userData.shop = [];
@@ -446,6 +455,7 @@
           }
 
           if (!userData) userData = JSON.parse(JSON.stringify(defaultUserData));
+          checkDailyReset();
           saveLocally();
           render();
 
@@ -453,7 +463,6 @@
             startTutorial();
           }
         } else {
-          // Als er geen gecachte sessie/lokale data is, toon inlogscherm
           if (!cachedLocal) {
             currentUser = null;
             userData = null;
@@ -490,6 +499,19 @@
       window.location.reload();
     }
 
+    // AUTOMATISCHE MIDDERNACHT RESET VOOR DAILIES
+    function checkDailyReset() {
+      if (!userData) return;
+      const today = new Date().toDateString();
+      if (userData.lastResetDate !== today) {
+        userData.lastResetDate = today;
+        if (userData.dailies) {
+          userData.dailies.forEach(d => d.completedToday = false);
+        }
+        saveLocally();
+      }
+    }
+
     function saveLocally() {
       if (userData) {
         localStorage.setItem('lifeRpgUserData', JSON.stringify(userData));
@@ -500,7 +522,6 @@
       if (currentUser && userData && database && navigator.onLine) {
         try {
           await database.ref('users/' + currentUser.uid).set(userData);
-          console.log('Cloud-synchronisatie voltooid!');
         } catch (e) {
           console.error('Cloud-sync mislukt:', e);
         }
@@ -508,16 +529,17 @@
     }
 
     function save() {
-      saveLocally();      // 1. Altijd direct lokaal opslaan (bliksemsnel)
-      syncDataWithCloud(); // 2. Synchroniseren met Firebase als er Wi-Fi is
+      saveLocally();
+      syncDataWithCloud();
       render();
     }
 
-    // TUTORIAL SYSTEM
+    // TUTORIAL SYSTEM (MET DAILIES UITLEG)
     let tutStep = 0;
     const tutSteps = [
       { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily tasks, level up, earn gold, and reward yourself." },
-      { title: "⚔️ Quests", body: "Add daily habits or tasks. Set deadlines, counters, or timers! Complete them on time to earn XP and Gold." },
+      { title: "📅 Dagelijkse Gewoontes (Dailies)", body: "In de 'Dailies' tab zet je routines zoals tandenpoetsen, douchen of opstaan. Ze resetten elke dag automatisch! Omdat je ze dagelijks doet, geven ze iets minder XP en Gold, maar helpen ze wel je dag goed te beginnen." },
+      { title: "⚔️ Quests", body: "Gebruik Quests voor losse taken of grotere uitdagingen. Je kunt timers instellen, tellers toevoegen en deadlines meegeven voor meer beloningen!" },
       { title: "🎯 Goals", body: "Set big, long-term achievements (like passing an exam or losing weight). These give massive XP and Gold bonuses!" },
       { title: "🛒 The Shop", body: "Use your hard-earned Gold to buy real-life rewards you create (e.g., 1 hour of gaming, watching a movie, or a treat)." }
     ];
@@ -545,7 +567,6 @@
       }
     }
 
-    // UI & TAB LOGIC
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -577,6 +598,8 @@
 
     function render() {
       if (!userData) return;
+      checkDailyReset();
+      
       const maxXp = userData.level * 100;
 
       document.getElementById('level').innerText = `Lvl ${userData.level}`;
@@ -584,6 +607,31 @@
       document.getElementById('current-xp').innerText = userData.xp;
       document.getElementById('max-xp').innerText = maxXp;
       document.getElementById('xp-bar').style.width = `${Math.min((userData.xp / maxXp) * 100, 100)}%`;
+
+      // Render Dailies
+      const dailyList = document.getElementById('daily-list');
+      const dailies = userData.dailies || [];
+      dailyList.innerHTML = dailies.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">Geen dagelijkse gewoontes ingesteld.</p>' : '';
+      
+      dailies.forEach(d => {
+        const isDone = d.completedToday;
+        const actionBtn = isDone 
+          ? `<button class="btn-action" style="background:#2d2d35; color:var(--subtext); cursor:default;" disabled>✅ Voltooid</button>`
+          : `<button class="btn-action" style="background:var(--success); color:white;" onclick="completeDaily(${d.id})">✓ Voltooien</button>`;
+
+        dailyList.innerHTML += `
+          <div class="card daily-card ${isDone ? 'completed-card' : ''}">
+            <div class="card-info">
+              <h4>${d.title}</h4>
+              <p><span class="badge-xp">+${d.xp} XP</span> • <span class="badge-gold">+${d.gold} Gold</span></p>
+            </div>
+            <div class="actions">
+              ${actionBtn}
+              <button class="btn-delete" onclick="deleteDaily(${d.id})">🗑️</button>
+            </div>
+          </div>
+        `;
+      });
 
       // Render Quests
       const questList = document.getElementById('quest-list');
@@ -669,7 +717,33 @@
       });
     }
 
-    // ACTIONS & DATA MANIPULATION
+    // DAILIES ACTIES
+    function addDaily(e) {
+      e.preventDefault();
+      const title = document.getElementById('daily-title').value;
+      const xp = parseInt(document.getElementById('daily-xp').value);
+      const gold = Math.max(1, Math.round(xp / 2.5));
+
+      if (!userData.dailies) userData.dailies = [];
+      userData.dailies.push({ id: Date.now(), title, xp, gold, completedToday: false });
+      document.getElementById('daily-title').value = '';
+      save();
+    }
+
+    function completeDaily(id) {
+      const daily = userData.dailies.find(d => d.id === id);
+      if (!daily || daily.completedToday) return;
+      daily.completedToday = true;
+      addRewards(daily.xp, daily.gold);
+      save();
+    }
+
+    function deleteDaily(id) {
+      userData.dailies = userData.dailies.filter(d => d.id !== id);
+      save();
+    }
+
+    // GENERAL ACTIONS
     function addQuest(e) {
       e.preventDefault();
       const title = document.getElementById('quest-title').value;
@@ -796,69 +870,63 @@
       setTimeout(() => toast.style.display = 'none', 3000);
     }
 
-    // INTERVAL VOOR TIMERS, DEADLINES EN MELDINGEN
+    // INTERVAL FOR TIMERS, DEADLINES & MIDNIGHT RESET CHECK
     setInterval(() => {
-      if (!userData || !userData.quests) return;
+      if (!userData) return;
+      
+      // Midnight Reset Check
+      checkDailyReset();
+
       const now = new Date().getTime();
       let hasChanges = false;
 
-      userData.quests = userData.quests.filter(q => {
-        if (q.dueDate) {
-          const dueTime = new Date(q.dueDate).getTime();
-          const timeLeft = dueTime - now;
+      if (userData.quests) {
+        userData.quests = userData.quests.filter(q => {
+          if (q.dueDate) {
+            const dueTime = new Date(q.dueDate).getTime();
+            const timeLeft = dueTime - now;
 
-          // Minder dan 15 minuten over
-          if (timeLeft > 0 && timeLeft <= 15 * 60 * 1000 && !q.warned) {
-            q.warned = true;
-            hasChanges = true;
-            sendNotification('⏰ Deadline Nabij!', `Je hebt nog minder dan 15 minuten voor: "${q.title}"!`);
-          }
+            if (timeLeft > 0 && timeLeft <= 15 * 60 * 1000 && !q.warned) {
+              q.warned = true;
+              hasChanges = true;
+              sendNotification('⏰ Deadline Nabij!', `Je hebt nog minder dan 15 minuten voor: "${q.title}"!`);
+            }
 
-          // Verlopen deadline
-          if (now >= dueTime) {
-            showToast(`❌ Quest expired: "${q.title}"!`);
-            sendNotification('❌ Quest Verlopen', `De deadline voor "${q.title}" is verstreken.`);
-            hasChanges = true;
-            return false;
+            if (now >= dueTime) {
+              showToast(`❌ Quest expired: "${q.title}"!`);
+              sendNotification('❌ Quest Verlopen', `De deadline voor "${q.title}" is verstreken.`);
+              hasChanges = true;
+              return false;
+            }
           }
-        }
-        return true;
-      });
+          return true;
+        });
 
-      // Timers bijwerken
-      userData.quests.forEach(q => {
-        if (q.type === 'timer' && q.isRunning) {
-          if (q.remainingSeconds > 0) {
-            q.remainingSeconds--;
-            const disp = document.getElementById(`time-disp-${q.id}`);
-            if (disp) disp.innerText = `⏱️ ${formatTime(q.remainingSeconds)}`;
-          } else {
-            q.isRunning = false;
-            sendNotification('⏱️ Timer Afgelopen!', `De timer voor "${q.title}" is klaar!`);
-            completeQuest(q.id);
+        userData.quests.forEach(q => {
+          if (q.type === 'timer' && q.isRunning) {
+            if (q.remainingSeconds > 0) {
+              q.remainingSeconds--;
+              const disp = document.getElementById(`time-disp-${q.id}`);
+              if (disp) disp.innerText = `⏱️ ${formatTime(q.remainingSeconds)}`;
+            } else {
+              q.isRunning = false;
+              sendNotification('⏱️ Timer Afgelopen!', `De timer voor "${q.title}" is klaar!`);
+              completeQuest(q.id);
+            }
           }
-        }
-      });
+        });
+      }
 
       if (hasChanges) save();
     }, 1000);
   </script>
 
-  <!-- PWA SERVICE WORKER REGISTRATIE -->
+  <!-- PWA SERVICE WORKER -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then(reg => {
           console.log('Service Worker geregistreerd!', reg);
-
-          reg.addEventListener('updatefound', () => {
-            const newWorker = reg.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                sendNotification('🚀 Nieuwe App Update!', 'Er is een nieuwe versie van Life RPG beschikbaar. Herlaad je pagina!');
-              }
-            });
-          });
         }).catch(err => console.log('Service Worker fout:', err));
       });
     }
