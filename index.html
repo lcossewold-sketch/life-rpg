@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>My Life RPG</title>
 
-  <!-- Howler.js bibliotheek voor geluiden -->
+  <!-- Howler.js library for audio -->
   <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js" crossorigin="anonymous"></script>
 
   <!-- Firebase Web SDK -->
@@ -164,7 +164,7 @@
       <div class="top-bar">
         <span>Hero: <strong id="user-display" style="color: var(--text);">Player</strong> <span id="network-status" class="status-tag">🟢 Online</span></span>
         <div class="header-btns">
-          <button class="icon-btn" onclick="requestNotificationPermission()">🔔 Meldingen</button>
+          <button class="icon-btn" onclick="requestNotificationPermission()">🔔 Notifications</button>
           <button class="icon-btn" onclick="startTutorial()">❓ Help</button>
           <button class="icon-btn" onclick="logout()">🚪 Logout</button>
         </div>
@@ -191,13 +191,13 @@
     <div id="dailies" class="section active">
       <form class="add-form" onsubmit="addDaily(event)">
         <div class="form-row">
-          <input type="text" id="daily-title" placeholder="Dagelijkse gewoonte (bijv. Tanden poetsen)..." required>
+          <input type="text" id="daily-title" placeholder="Daily habit (e.g. Brush teeth)..." required>
         </div>
         <div class="form-row">
           <select id="daily-xp" style="flex: 1;">
-            <option value="5">⚡ Klein (+5 XP / +2 Gold)</option>
-            <option value="10" selected>🌱 Normaal (+10 XP / +4 Gold)</option>
-            <option value="15">🔥 Belangrijk (+15 XP / +6 Gold)</option>
+            <option value="5">⚡ Small (+5 XP / +2 Gold)</option>
+            <option value="10" selected>🌱 Normal (+10 XP / +4 Gold)</option>
+            <option value="15">🔥 Important (+15 XP / +6 Gold)</option>
           </select>
           <button type="submit" class="btn-add">+</button>
         </div>
@@ -272,8 +272,8 @@
 
   <!-- UPDATE NOTIFICATION TOAST -->
   <div id="update-toast" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#6366f1; color:white; padding:12px 20px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.6); z-index:9999; text-align:center; width: 90%; max-width: 400px; justify-content: space-between; align-items: center;">
-    <span style="font-size:0.85rem; font-weight:bold;">🚀 Nieuwe update beschikbaar!</span>
-    <button onclick="updateApp()" style="background:white; color:#6366f1; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left: 10px;">Update Nu</button>
+    <span style="font-size:0.85rem; font-weight:bold;">🚀 New update available!</span>
+    <button onclick="updateApp()" style="background:white; color:#6366f1; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left: 10px;">Update Now</button>
   </div>
 
   <!-- TUTORIAL MODAL -->
@@ -338,16 +338,16 @@
 
     function requestNotificationPermission() {
       if (!('Notification' in window)) {
-        alert('Je browser ondersteunt helaas geen mobiele notificaties.');
+        alert('Your browser does not support notifications.');
         return;
       }
 
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
-          showToast('🔔 Meldingen staan nu AAN!');
-          sendNotification('🎮 Life RPG', 'Meldingen zijn succesvol ingeschakeld!');
+          showToast('🔔 Notifications turned ON!');
+          sendNotification('🎮 Life RPG', 'Notifications enabled successfully!');
         } else if (permission === 'denied') {
-          alert('Je hebt meldingen geblokkeerd.');
+          alert('Notifications are blocked.');
         }
       });
     }
@@ -369,7 +369,7 @@
       }
     }
 
-    // FIREBASE INITIALISATIE
+    // FIREBASE INITIALIZATION
     const firebaseConfig = {
       apiKey: "AIzaSyD2FPl7SpLniSCgYNimRx8LGLmECIpVKck",
       authDomain: "life-rpg-eaa3e.firebaseapp.com",
@@ -387,7 +387,7 @@
       database = firebase.database();
       auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch (e) {
-      console.error("Firebase config fout:", e);
+      console.error("Firebase config error:", e);
     }
 
     let currentUser = null;
@@ -400,9 +400,9 @@
       hasSeenTutorial: false,
       lastResetDate: new Date().toDateString(),
       dailies: [
-        { id: 101, title: 'Tanden poetsen 🪥', xp: 10, gold: 4, completedToday: false },
-        { id: 102, title: 'Lekker douchen 🚿', xp: 10, gold: 4, completedToday: false },
-        { id: 103, title: 'Op tijd opstaan ⏰', xp: 15, gold: 6, completedToday: false }
+        { id: 101, title: 'Brush teeth 🪥', xp: 10, gold: 4, completedToday: false },
+        { id: 102, title: 'Take a shower 🚿', xp: 10, gold: 4, completedToday: false },
+        { id: 103, title: 'Wake up early ⏰', xp: 15, gold: 6, completedToday: false }
       ],
       quests: [
         { id: 1, title: 'Drink 8 glasses of water', type: 'counter', current: 0, target: 8, xp: 50, gold: 20 },
@@ -419,7 +419,7 @@
     function loadLocalData() {
       const saved = localStorage.getItem('lifeRpgUserData');
       if (saved) {
-        try { return JSON.parse(saved); } catch (e) { console.error('Fout bij laden van local data', e); }
+        try { return JSON.parse(saved); } catch (e) { console.error('Error loading local data', e); }
       }
       return null;
     }
@@ -456,7 +456,7 @@
                 await database.ref('users/' + user.uid).set(userData);
               }
             } catch (err) {
-              console.log('Kon clouddata niet ophalen, we gebruiken lokale data.');
+              console.log('Could not fetch cloud data, using local data.');
             }
           }
 
@@ -481,7 +481,7 @@
 
     async function handleAuth(e) {
       e.preventDefault();
-      if (!auth) { alert("Firebase is niet geïnitialiseerd!"); return; }
+      if (!auth) { alert("Firebase is not initialized!"); return; }
 
       const email = document.getElementById('auth-email').value.trim();
       const pass = document.getElementById('auth-pass').value.trim();
@@ -528,7 +528,7 @@
         try {
           await database.ref('users/' + currentUser.uid).set(userData);
         } catch (e) {
-          console.error('Cloud-sync mislukt:', e);
+          console.error('Cloud sync failed:', e);
         }
       }
     }
@@ -543,8 +543,8 @@
     let tutStep = 0;
     const tutSteps = [
       { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily tasks, level up, earn gold, and reward yourself." },
-      { title: "📅 Dagelijkse Gewoontes (Dailies)", body: "In de 'Dailies' tab zet je routines zoals tandenpoetsen, douchen of opstaan. Ze resetten elke dag automatisch! Omdat je ze dagelijks doet, geven ze iets minder XP en Gold, maar helpen ze wel je dag goed te beginnen." },
-      { title: "⚔️ Quests", body: "Gebruik Quests voor losse taken of grotere uitdagingen. Je kunt timers instellen, tellers toevoegen en deadlines meegeven voor meer beloningen!" },
+      { title: "📅 Daily Habits (Dailies)", body: "In the 'Dailies' tab you can set routines like brushing teeth, showering, or waking up early. They reset automatically every day! Doing them daily gives steady XP and Gold to start your day right." },
+      { title: "⚔️ Quests", body: "Use Quests for one-time tasks or bigger challenges. Set timers, track counts, and add deadlines for higher rewards!" },
       { title: "🎯 Goals", body: "Set big, long-term achievements (like passing an exam or losing weight). These give massive XP and Gold bonuses!" },
       { title: "🛒 The Shop", body: "Use your hard-earned Gold to buy real-life rewards you create (e.g., 1 hour of gaming, watching a movie, or a treat)." }
     ];
@@ -616,13 +616,13 @@
       // Render Dailies
       const dailyList = document.getElementById('daily-list');
       const dailies = userData.dailies || [];
-      dailyList.innerHTML = dailies.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">Geen dagelijkse gewoontes ingesteld.</p>' : '';
+      dailyList.innerHTML = dailies.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No daily habits set.</p>' : '';
       
       dailies.forEach(d => {
         const isDone = d.completedToday;
         const actionBtn = isDone 
-          ? `<button class="btn-action" style="background:#2d2d35; color:var(--subtext); cursor:default;" disabled>✅ Voltooid</button>`
-          : `<button class="btn-action" style="background:var(--success); color:white;" onclick="completeDaily(${d.id})">✓ Voltooien</button>`;
+          ? `<button class="btn-action" style="background:#2d2d35; color:var(--subtext); cursor:default;" disabled>✅ Completed</button>`
+          : `<button class="btn-action" style="background:var(--success); color:white;" onclick="completeDaily(${d.id})">✓ Complete</button>`;
 
         dailyList.innerHTML += `
           <div class="card daily-card ${isDone ? 'completed-card' : ''}">
@@ -722,7 +722,7 @@
       });
     }
 
-    // DAILIES ACTIES
+    // DAILIES ACTIONS
     function addDaily(e) {
       e.preventDefault();
       const title = document.getElementById('daily-title').value;
@@ -893,12 +893,12 @@
             if (timeLeft > 0 && timeLeft <= 15 * 60 * 1000 && !q.warned) {
               q.warned = true;
               hasChanges = true;
-              sendNotification('⏰ Deadline Nabij!', `Je hebt nog minder dan 15 minuten voor: "${q.title}"!`);
+              sendNotification('⏰ Deadline Nearing!', `You have less than 15 minutes left for: "${q.title}"!`);
             }
 
             if (now >= dueTime) {
               showToast(`❌ Quest expired: "${q.title}"!`);
-              sendNotification('❌ Quest Verlopen', `De deadline voor "${q.title}" is verstreken.`);
+              sendNotification('❌ Quest Expired', `The deadline for "${q.title}" has passed.`);
               hasChanges = true;
               return false;
             }
@@ -914,7 +914,7 @@
               if (disp) disp.innerText = `⏱️ ${formatTime(q.remainingSeconds)}`;
             } else {
               q.isRunning = false;
-              sendNotification('⏱️ Timer Afgelopen!', `De timer voor "${q.title}" is klaar!`);
+              sendNotification('⏱️ Timer Finished!', `The timer for "${q.title}" is done!`);
               completeQuest(q.id);
             }
           }
