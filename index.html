@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <!-- Zorgt dat de app op mobiel goed schaalt en eruitziet als een echte app -->
-<meta name="theme-color" content="#6366f1">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Life RPG">
-<link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Life RPG">
+  <link rel="manifest" href="manifest.json">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>My Life RPG</title>
 
   <!-- Howler.js bibliotheek voor geluiden -->
-<script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js" crossorigin="anonymous"></script>
 
   <!-- Firebase Web SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -96,6 +96,7 @@
     .form-row { display: flex; gap: 8px; width: 100%; }
     input, select { background: #121214; border: 1px solid #2d2d35; color: var(--text); padding: 10px; border-radius: 8px; outline: none; font-size: 0.9rem; }
     input[type="text"], input[type="email"], input[type="password"] { flex: 1; }
+    input[type="datetime-local"] { color: var(--text); font-size: 0.8rem; }
     .btn-add { background: var(--success); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
     /* Item list */
@@ -107,6 +108,7 @@
     .badge-xp { color: var(--accent); font-weight: bold; font-size: 0.85rem; }
     .badge-gold { color: var(--accent-gold); font-weight: bold; font-size: 0.85rem; }
     .badge-progress { color: #38bdf8; font-weight: bold; font-size: 0.85rem; }
+    .badge-due { color: #f43f5e; font-weight: bold; font-size: 0.8rem; display: inline-block; margin-top: 2px; }
     
     .actions { display: flex; gap: 4px; align-items: center; }
     .btn-action { background: #2d2d35; border: none; color: var(--text); padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
@@ -201,6 +203,10 @@
             <option value="100">100 XP</option>
             <option value="250">250 XP</option>
           </select>
+        </div>
+        <!-- Veld voor de Optionele Deadline -->
+        <div class="form-row">
+          <input type="datetime-local" id="quest-due" style="width: 100%; flex: 1;">
           <button type="submit" class="btn-add">+</button>
         </div>
       </form>
@@ -250,7 +256,7 @@
   </div>
 
   <script>
-    // GLOBAL UI FUNCTIONS (Placed at top so buttons ALWAYS work)
+    // GLOBAL UI FUNCTIONS
     let isRegisterMode = false;
 
     function toggleAuthMode() {
@@ -286,15 +292,15 @@
       }
     }
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD2FPl7SpLniSCgYNimRx8LGLmECIpVKck",
-  authDomain: "life-rpg-eaa3e.firebaseapp.com",
-  databaseURL: "https://life-rpg-eaa3e-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "life-rpg-eaa3e",
-  storageBucket: "life-rpg-eaa3e.firebasestorage.app",
-  messagingSenderId: "119046286545",
-  appId: "1:119046286545:web:df65b5743c19b1f7b269f0"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyD2FPl7SpLniSCgYNimRx8LGLmECIpVKck",
+      authDomain: "life-rpg-eaa3e.firebaseapp.com",
+      databaseURL: "https://life-rpg-eaa3e-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "life-rpg-eaa3e",
+      storageBucket: "life-rpg-eaa3e.firebasestorage.app",
+      messagingSenderId: "119046286545",
+      appId: "1:119046286545:web:df65b5743c19b1f7b269f0"
+    };
 
     // Firebase Initialiseren
     let auth, database;
@@ -362,7 +368,7 @@ const firebaseConfig = {
     async function handleAuth(e) {
       e.preventDefault();
       if (!auth) {
-        alert("Firebase Config keys represent missing or invalid! Replace YOUR_API_KEY with your real Firebase keys.");
+        alert("Firebase Config keys represent missing or invalid!");
         return;
       }
 
@@ -397,7 +403,7 @@ const firebaseConfig = {
     let tutStep = 0;
     const tutSteps = [
       { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily tasks, level up, earn gold, and unlock real-life rewards." },
-      { title: "⚔️ Quests", body: "Add daily habits or tasks. Choose between Instant, Counter (e.g. 8 glasses of water), or Timers! Complete them to earn XP and Gold." },
+      { title: "⚔️ Quests", body: "Add daily habits or tasks. Set deadlines, counters, or timers! Complete them on time to earn XP and Gold." },
       { title: "🎯 Goals", body: "Set big, long-term achievements (like passing an exam or losing weight). These give massive XP and Gold bonuses!" },
       { title: "🛒 The Shop", body: "Use your hard-earned Gold to buy real-life rewards you create (e.g., 1 hour of gaming, watching a movie, or a treat)." }
     ];
@@ -473,6 +479,13 @@ const firebaseConfig = {
       quests.forEach(q => {
         let actionButtons = '';
         let extraBadge = '';
+        let dueBadge = '';
+
+        if (q.dueDate) {
+          const d = new Date(q.dueDate);
+          const formattedDate = d.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+          dueBadge = `<br><span class="badge-due">⏳ Due: ${formattedDate}</span>`;
+        }
 
         if (q.type === 'counter') {
           extraBadge = ` • <span class="badge-progress">Progress: ${q.current}/${q.target}</span>`;
@@ -493,7 +506,7 @@ const firebaseConfig = {
           <div class="card">
             <div class="card-info">
               <h4>${q.title}</h4>
-              <p><span class="badge-xp">+${q.xp} XP</span> • <span class="badge-gold">+${q.gold} Gold</span>${extraBadge}</p>
+              <p><span class="badge-xp">+${q.xp} XP</span> • <span class="badge-gold">+${q.gold} Gold</span>${extraBadge}${dueBadge}</p>
             </div>
             <div class="actions">
               ${actionButtons}
@@ -550,14 +563,17 @@ const firebaseConfig = {
       const xp = parseInt(document.getElementById('quest-xp').value);
       const gold = Math.round(xp / 2.5);
       const targetVal = parseInt(document.getElementById('quest-target').value) || 1;
+      const dueVal = document.getElementById('quest-due').value; // Ingelezen datum/tijd
 
       const newQuest = { id: Date.now(), title, type, xp, gold };
+      if (dueVal) newQuest.dueDate = dueVal;
       if (type === 'counter') { newQuest.current = 0; newQuest.target = targetVal; }
       else if (type === 'timer') { newQuest.targetSeconds = targetVal * 60; newQuest.remainingSeconds = targetVal * 60; newQuest.isRunning = false; }
 
       if (!userData.quests) userData.quests = [];
       userData.quests.push(newQuest);
       document.getElementById('quest-title').value = '';
+      document.getElementById('quest-due').value = '';
       save();
     }
 
@@ -666,9 +682,26 @@ const firebaseConfig = {
       setTimeout(() => toast.style.display = 'none', 3000);
     }
 
-    // TIMER INTERVAL
+    // INTERVAL VOOR TIMERS EN OVERDUE QUESTS
     setInterval(() => {
       if (!userData || !userData.quests) return;
+      const now = new Date().getTime();
+      let hasChanges = false;
+
+      // Controleer op verlopen deadlines
+      userData.quests = userData.quests.filter(q => {
+        if (q.dueDate) {
+          const dueTime = new Date(q.dueDate).getTime();
+          if (now >= dueTime) {
+            showToast(`❌ Quest expired: "${q.title}"! No rewards given.`);
+            hasChanges = true;
+            return false; // Verwijder de quest
+          }
+        }
+        return true;
+      });
+
+      // Update actieve timers
       userData.quests.forEach(q => {
         if (q.type === 'timer' && q.isRunning) {
           if (q.remainingSeconds > 0) {
@@ -681,6 +714,8 @@ const firebaseConfig = {
           }
         }
       });
+
+      if (hasChanges) save();
     }, 1000);
   </script>
 
