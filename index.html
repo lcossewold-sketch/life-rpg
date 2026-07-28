@@ -179,7 +179,7 @@
       <div class="xp-text"><span id="current-xp">0</span> / <span id="max-xp">100</span> XP</div>
     </div>
 
-    <!-- Tab Navigation met Nieuwe Dailies Tab -->
+    <!-- Tab Navigation -->
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('dailies', this)">📅 Dailies</button>
       <button class="tab-btn" onclick="switchTab('quests', this)">⚔️ Quests</button>
@@ -269,6 +269,12 @@
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <!-- UPDATE NOTIFICATION TOAST -->
+  <div id="update-toast" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#6366f1; color:white; padding:12px 20px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.6); z-index:9999; text-align:center; width: 90%; max-width: 400px; justify-content: space-between; align-items: center;">
+    <span style="font-size:0.85rem; font-weight:bold;">🚀 Nieuwe update beschikbaar!</span>
+    <button onclick="updateApp()" style="background:white; color:#6366f1; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left: 10px;">Update Nu</button>
+  </div>
 
   <!-- TUTORIAL MODAL -->
   <div class="modal-overlay" id="tutorial-modal">
@@ -499,7 +505,6 @@
       window.location.reload();
     }
 
-    // AUTOMATISCHE MIDDERNACHT RESET VOOR DAILIES
     function checkDailyReset() {
       if (!userData) return;
       const today = new Date().toDateString();
@@ -534,7 +539,7 @@
       render();
     }
 
-    // TUTORIAL SYSTEM (MET DAILIES UITLEG)
+    // TUTORIAL SYSTEM
     let tutStep = 0;
     const tutSteps = [
       { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily tasks, level up, earn gold, and reward yourself." },
@@ -874,7 +879,6 @@
     setInterval(() => {
       if (!userData) return;
       
-      // Midnight Reset Check
       checkDailyReset();
 
       const now = new Date().getTime();
@@ -921,14 +925,49 @@
     }, 1000);
   </script>
 
-  <!-- PWA SERVICE WORKER -->
+  <!-- PWA SERVICE WORKER & UPDATE NOTIFICATION LOGIC -->
   <script>
+    let newWorker;
+
+    function updateApp() {
+      if (newWorker) {
+        newWorker.postMessage({ action: 'skipWaiting' });
+      }
+      window.location.reload();
+    }
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then(reg => {
-          console.log('Service Worker geregistreerd!', reg);
-        }).catch(err => console.log('Service Worker fout:', err));
+          
+          if (reg.waiting) {
+            newWorker = reg.waiting;
+            showUpdateToast();
+          }
+
+          reg.addEventListener('updatefound', () => {
+            newWorker = reg.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                showUpdateToast();
+              }
+            });
+          });
+        });
+
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
       });
+    }
+
+    function showUpdateToast() {
+      const toast = document.getElementById('update-toast');
+      if (toast) toast.style.display = 'flex';
     }
   </script>
 </body>
