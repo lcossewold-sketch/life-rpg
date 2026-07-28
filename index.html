@@ -96,7 +96,18 @@
     .form-row { display: flex; gap: 8px; width: 100%; }
     input, select { background: #121214; border: 1px solid #2d2d35; color: var(--text); padding: 10px; border-radius: 8px; outline: none; font-size: 0.9rem; }
     input[type="text"], input[type="email"], input[type="password"] { flex: 1; }
-    input[type="datetime-local"] { color: var(--text); font-size: 0.8rem; }
+input[type="datetime-local"] { 
+  color: #ffffff !important; 
+  background-color: #121214 !important;
+  color-scheme: dark; /* Dwingt het mobiele kalendertje in een goed leesbare dark mode */
+  font-size: 0.85rem;
+}
+
+/* Zorgt dat het kalender-icoontje op iPhones/Androids zichtbaar blijft */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
     .btn-add { background: var(--success); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
     /* Item list */
