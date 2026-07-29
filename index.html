@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.json">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>My Life RPG</title>
+  <title>Life RPG</title>
 
   <!-- Howler.js sound library -->
   <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js" crossorigin="anonymous"></script>
@@ -20,91 +20,216 @@
 
   <style>
     :root {
-      --bg: #121214;
-      --card: #1e1e24;
+      --bg: #0b0f19;
+      --card-bg: #151c2c;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --input-bg: #0f172a;
       --accent: #6366f1;
-      --accent-gold: #f59e0b;
-      --text: #f3f4f6;
-      --subtext: #9ca3af;
+      --accent-hover: #4f46e5;
+      --accent-purple: #8b5cf6;
+      --accent-gold: #fbbf24;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
       --success: #10b981;
+      --success-hover: #059669;
       --danger: #ef4444;
       --goal-accent: #ec4899;
       --daily-accent: #10b981;
+      --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 40px; max-width: 500px; margin: 0 auto; overflow-x: hidden; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; }
+    
+    body { 
+      background-color: var(--bg); 
+      background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 60%);
+      color: var(--text-main); 
+      padding: 16px; 
+      padding-bottom: 50px; 
+      max-width: 500px; 
+      margin: 0 auto; 
+      min-height: 100vh;
+      overflow-x: hidden; 
+      -webkit-tap-highlight-color: transparent;
+    }
 
     /* AUTH / LOGIN SCREEN */
-    #auth-screen { display: flex; flex-direction: column; justify-content: center; min-height: 80vh; }
-    .auth-card { background: var(--card); padding: 24px; border-radius: 16px; border: 1px solid #2d2d35; text-align: left; }
-    .auth-card h2 { margin-bottom: 6px; color: var(--accent); text-align: center; }
-    .auth-card p.subtitle { color: var(--subtext); margin-bottom: 20px; font-size: 0.85rem; text-align: center; }
+    #auth-screen { display: flex; flex-direction: column; justify-content: center; min-height: 85vh; }
+    .auth-card { 
+      background: var(--card-bg); 
+      padding: 28px 24px; 
+      border-radius: 20px; 
+      border: 1px solid var(--card-border); 
+      box-shadow: var(--shadow-soft);
+      text-align: left; 
+    }
+    .auth-card h2 { margin-bottom: 6px; color: var(--text-main); text-align: center; font-size: 1.5rem; letter-spacing: -0.5px; }
+    .auth-card p.subtitle { color: var(--text-muted); margin-bottom: 24px; font-size: 0.88rem; text-align: center; }
     
-    .input-label { display: block; color: var(--text); font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; margin-top: 12px; }
+    .input-label { display: block; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; margin-top: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
     .auth-card input { width: 100%; margin-bottom: 4px; }
 
     .password-container { position: relative; width: 100%; margin-bottom: 4px; }
-    .password-container input { width: 100%; padding-right: 40px; margin-bottom: 0; }
-    .toggle-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--subtext); cursor: pointer; font-size: 1.1rem; }
+    .password-container input { width: 100%; padding-right: 42px; margin-bottom: 0; }
+    .toggle-eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; }
 
-    .auth-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 16px; margin-bottom: 12px; }
-    .auth-links { display: flex; flex-direction: column; gap: 10px; text-align: center; margin-top: 8px; }
-    
-    .auth-toggle, .auth-forgot { 
-      background: none; border: none; color: var(--subtext); font-size: 0.85rem; cursor: pointer; text-decoration: underline; font-family: inherit;
+    .auth-btn { 
+      width: 100%; 
+      background: linear-gradient(135deg, var(--accent), var(--accent-purple)); 
+      color: white; 
+      border: none; 
+      padding: 13px; 
+      border-radius: 12px; 
+      font-weight: 700; 
+      cursor: pointer; 
+      font-size: 1rem; 
+      margin-top: 20px; 
+      margin-bottom: 12px; 
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+      transition: all 0.2s ease;
     }
+    .auth-btn:active { transform: scale(0.98); }
+
+    .auth-links { display: flex; flex-direction: column; gap: 10px; text-align: center; margin-top: 10px; }
+    .auth-toggle, .auth-forgot { 
+      background: none; border: none; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; text-decoration: none; font-family: inherit; transition: color 0.2s;
+    }
+    .auth-toggle:hover { color: var(--text-main); }
     .auth-forgot { color: var(--accent-gold); }
 
     /* MAIN APP */
     #app-screen { display: none; }
 
-    .header { background: var(--card); padding: 16px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #2d2d35; position: relative; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.85rem; color: var(--subtext); }
-    .status-tag { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background: #2d2d35; margin-left: 6px; }
-    .profile { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .level-badge { background: var(--accent); color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; display: inline-block; }
-    .user-title { font-size: 0.85rem; color: var(--accent-gold); font-weight: bold; margin-top: 4px; }
-    .currency { color: var(--accent-gold); font-weight: bold; font-size: 1.1rem; }
+    /* HEADER */
+    .header { 
+      background: var(--card-bg); 
+      padding: 18px; 
+      border-radius: 20px; 
+      margin-bottom: 18px; 
+      border: 1px solid var(--card-border); 
+      box-shadow: var(--shadow-soft);
+      position: relative; 
+    }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 0.85rem; color: var(--text-muted); }
+    .status-tag { font-size: 0.72rem; padding: 3px 8px; border-radius: 20px; background: rgba(255, 255, 255, 0.06); font-weight: 600; margin-left: 6px; }
+    
+    .profile { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .level-badge { 
+      background: linear-gradient(135deg, var(--accent), var(--accent-purple)); 
+      color: white; 
+      padding: 5px 14px; 
+      border-radius: 20px; 
+      font-weight: 800; 
+      font-size: 1.05rem; 
+      display: inline-block; 
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    .user-title { font-size: 0.82rem; color: var(--accent-gold); font-weight: 700; margin-top: 4px; letter-spacing: 0.3px; }
+    .currency { color: var(--accent-gold); font-weight: 800; font-size: 1.15rem; display: flex; align-items: center; gap: 4px; }
 
-    .progress-container { background: #2d2d35; border-radius: 10px; height: 16px; width: 100%; overflow: hidden; margin-bottom: 6px; }
-    .progress-bar { background: linear-gradient(90deg, #4f46e5, #818cf8); height: 100%; width: 0%; transition: width 0.3s ease; }
-    .xp-text { font-size: 0.8rem; color: var(--subtext); text-align: right; }
+    .progress-container { 
+      background: #0f172a; 
+      border-radius: 12px; 
+      height: 14px; 
+      width: 100%; 
+      overflow: hidden; 
+      margin-bottom: 6px; 
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .progress-bar { 
+      background: linear-gradient(90deg, #6366f1, #a855f7); 
+      height: 100%; 
+      width: 0%; 
+      border-radius: 12px;
+      transition: width 0.4s ease; 
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+    }
+    .xp-text { font-size: 0.78rem; color: var(--text-muted); text-align: right; font-weight: 600; }
 
-    .header-btns { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
-    .icon-btn { background: #2d2d35; border: none; color: var(--text); padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 3px; }
-    .icon-btn.active-notif { background: #059669; color: white; }
+    .header-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .icon-btn { 
+      background: rgba(255, 255, 255, 0.06); 
+      border: 1px solid rgba(255, 255, 255, 0.08); 
+      color: var(--text-main); 
+      padding: 6px 10px; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      font-size: 0.75rem; 
+      font-weight: 600; 
+      display: flex; 
+      align-items: center; 
+      gap: 4px; 
+      transition: all 0.2s;
+    }
+    .icon-btn:active { transform: scale(0.95); }
+    .icon-btn.active-notif { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #34d399; }
 
     /* Tabs Navigation */
-    .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
-    .tab-btn { flex: 1; padding: 10px 2px; border: none; background: var(--card); color: var(--subtext); border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; text-align: center; }
-    .tab-btn.active { background: var(--accent); color: white; }
+    .tabs { 
+      display: flex; 
+      gap: 6px; 
+      margin-bottom: 18px; 
+      background: rgba(21, 28, 44, 0.6); 
+      padding: 4px; 
+      border-radius: 14px; 
+      border: 1px solid var(--card-border);
+    }
+    .tab-btn { 
+      flex: 1; 
+      padding: 10px 4px; 
+      border: none; 
+      background: transparent; 
+      color: var(--text-muted); 
+      border-radius: 10px; 
+      font-weight: 700; 
+      cursor: pointer; 
+      font-size: 0.82rem; 
+      text-align: center; 
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active { 
+      background: var(--accent); 
+      color: white; 
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+    }
 
     .section { display: none; }
     .section.active { display: block; }
 
-    /* Forms & Responsiveness Fixes */
-    .add-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid #2d2d35; }
+    /* Forms & Inputs */
+    .add-form { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px; 
+      margin-bottom: 18px; 
+      background: var(--card-bg); 
+      padding: 14px; 
+      border-radius: 16px; 
+      border: 1px solid var(--card-border); 
+      box-shadow: var(--shadow-soft);
+    }
     .form-row { display: flex; gap: 8px; width: 100%; align-items: center; }
     
     input, select { 
-      background: #121214; 
-      border: 1px solid #2d2d35; 
-      color: var(--text); 
-      padding: 10px; 
-      border-radius: 8px; 
+      background: var(--input-bg); 
+      border: 1px solid var(--card-border); 
+      color: var(--text-main); 
+      padding: 10px 12px; 
+      border-radius: 10px; 
       outline: none; 
       font-size: 0.85rem; 
       min-width: 0; 
       box-sizing: border-box; 
+      transition: border-color 0.2s;
     }
+    input:focus, select:focus { border-color: var(--accent); }
 
     input[type="text"], input[type="email"], input[type="password"] { flex: 1; min-width: 0; }
     
     input[type="datetime-local"], input[type="time"] { 
-      color: #ffffff !important; 
-      background-color: #2d2d35 !important;
-      border: 1px solid #3f3f46 !important;
+      color: var(--text-main) !important; 
+      background-color: var(--input-bg) !important;
+      border: 1px solid var(--card-border) !important;
       color-scheme: dark;
       font-size: 0.85rem;
       min-width: 0;
@@ -119,47 +244,139 @@
       white-space: nowrap;
     }
 
-    .btn-add { background: var(--success); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; flex-shrink: 0; }
+    .btn-add { 
+      background: var(--success); 
+      color: white; 
+      border: none; 
+      padding: 10px 16px; 
+      border-radius: 10px; 
+      font-weight: 800; 
+      font-size: 1.1rem;
+      cursor: pointer; 
+      flex-shrink: 0; 
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      transition: transform 0.15s ease;
+    }
+    .btn-add:active { transform: scale(0.95); }
 
-    /* Item list */
+    /* Item Cards */
     .list { display: flex; flex-direction: column; gap: 10px; }
-    .card { background: var(--card); border: 1px solid #2d2d35; padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+    
+    .card { 
+      background: var(--card-bg); 
+      border: 1px solid var(--card-border); 
+      padding: 14px 16px; 
+      border-radius: 16px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.15s ease;
+    }
     .card.goal-card { border-left: 4px solid var(--goal-accent); }
     .card.daily-card { border-left: 4px solid var(--daily-accent); }
     
-    .card-info h4 { margin-bottom: 4px; font-size: 1rem; }
-    .card-info p { font-size: 0.8rem; color: var(--subtext); }
-    .badge-xp { color: var(--accent); font-weight: bold; font-size: 0.85rem; }
-    .badge-gold { color: var(--accent-gold); font-weight: bold; font-size: 0.85rem; }
-    .badge-progress { color: #38bdf8; font-weight: bold; font-size: 0.85rem; }
-    .badge-due { color: #f43f5e; font-weight: bold; font-size: 0.8rem; display: inline-block; margin-top: 2px; }
+    .card-info h4 { margin-bottom: 4px; font-size: 0.96rem; font-weight: 700; color: var(--text-main); }
+    .card-info p { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
     
-    .actions { display: flex; gap: 4px; align-items: center; }
-    .btn-action { background: #2d2d35; border: none; color: var(--text); padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
-    .btn-action:hover { background: var(--accent); }
-    .btn-count { background: #3b82f6; color: white; border: none; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .btn-minus { background: #4b5563; color: white; border: none; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .btn-timer { background: #8b5cf6; color: white; border: none; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .btn-delete { background: var(--card); border: 1px solid #3f3f46; color: #ef4444; padding: 8px 8px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .badge-xp { color: #818cf8; font-weight: 700; }
+    .badge-gold { color: var(--accent-gold); font-weight: 700; }
+    .badge-progress { color: #38bdf8; font-weight: 700; }
+    .badge-due { color: #f43f5e; font-weight: 700; display: inline-block; margin-top: 3px; }
+    
+    .actions { display: flex; gap: 6px; align-items: center; }
+    
+    .btn-action { 
+      background: rgba(255, 255, 255, 0.08); 
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      color: var(--text-main); 
+      padding: 8px 12px; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      font-weight: 700; 
+      font-size: 0.82rem; 
+      transition: all 0.2s ease;
+    }
+    .btn-action:active { transform: scale(0.95); }
+    
+    .btn-count { background: #3b82f6; color: white; border: none; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .btn-minus { background: rgba(255, 255, 255, 0.1); color: white; border: none; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .btn-timer { background: var(--accent-purple); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    
+    .btn-delete { 
+      background: rgba(239, 68, 68, 0.12); 
+      border: 1px solid rgba(239, 68, 68, 0.2); 
+      color: #ef4444; 
+      padding: 8px; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      font-weight: 700; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-    /* Toast */
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 100; text-align: center; }
+    /* Toast Notification */
+    .toast { 
+      position: fixed; 
+      bottom: 24px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      background: linear-gradient(135deg, var(--success), #059669); 
+      color: white; 
+      padding: 12px 24px; 
+      border-radius: 30px; 
+      font-weight: 700; 
+      font-size: 0.9rem;
+      display: none; 
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); 
+      z-index: 100; 
+      text-align: center; 
+    }
 
     /* MODALS */
-    .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; padding: 20px; z-index: 200; }
-    .modal-content { background: var(--card); border: 1px solid var(--accent); padding: 20px; border-radius: 16px; max-width: 440px; width: 100%; text-align: left; }
-    .modal-content h3 { color: var(--accent); margin-bottom: 10px; text-align: center; }
-    .modal-content p { color: var(--subtext); font-size: 0.9rem; line-height: 1.4; margin-bottom: 12px; }
+    .modal-overlay { 
+      position: fixed; top:0; left:0; right:0; bottom:0; 
+      background: rgba(0,0,0,0.8); 
+      backdrop-filter: blur(4px);
+      display: none; 
+      justify-content: center; 
+      align-items: center; 
+      padding: 20px; 
+      z-index: 200; 
+    }
+    .modal-content { 
+      background: var(--card-bg); 
+      border: 1px solid var(--card-border); 
+      padding: 24px; 
+      border-radius: 20px; 
+      max-width: 440px; 
+      width: 100%; 
+      text-align: left; 
+      box-shadow: var(--shadow-soft);
+    }
+    .modal-content h3 { color: var(--text-main); margin-bottom: 12px; text-align: center; font-size: 1.25rem; }
+    .modal-content p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 14px; }
     
-    .modal-nav-tabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid #3f3f46; padding-bottom: 8px; }
-    .modal-tab-btn { flex: 1; background: #2d2d35; border: none; color: var(--subtext); padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; text-align: center; }
+    .modal-nav-tabs { display: flex; gap: 6px; margin-bottom: 16px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
+    .modal-tab-btn { flex: 1; background: rgba(255,255,255,0.06); border: none; color: var(--text-muted); padding: 8px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; text-align: center; }
     .modal-tab-btn.active { background: var(--accent); color: white; }
 
-    .help-step-list { margin-left: 20px; color: var(--text); font-size: 0.85rem; line-height: 1.6; margin-bottom: 14px; }
+    .help-step-list { margin-left: 20px; color: var(--text-main); font-size: 0.85rem; line-height: 1.6; margin-bottom: 14px; }
     .help-step-list li { margin-bottom: 6px; }
 
-    .modal-footer { display: flex; justify-content: center; margin-top: 16px; }
-    .modal-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+    .modal-footer { display: flex; justify-content: center; margin-top: 18px; }
+    .modal-btn { 
+      background: linear-gradient(135deg, var(--accent), var(--accent-purple)); 
+      color: white; 
+      border: none; 
+      padding: 12px 20px; 
+      border-radius: 12px; 
+      font-weight: 700; 
+      cursor: pointer; 
+      width: 100%; 
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
   </style>
 </head>
 <body>
@@ -167,25 +384,25 @@
   <!-- AUTH SCREEN -->
   <div id="auth-screen">
     <div class="auth-card">
-      <h2 id="auth-title">🎮 Welcome to Life RPG</h2>
-      <p class="subtitle" id="auth-sub">Log in to continue with your hero</p>
+      <h2 id="auth-title">🎮 Life RPG</h2>
+      <p class="subtitle" id="auth-sub">Log in om verder te gaan met je hero</p>
       
       <form onsubmit="handleAuth(event)">
-        <label class="input-label" for="auth-email">Email Address</label>
-        <input type="email" id="auth-email" placeholder="e.g., hero@example.com" required>
+        <label class="input-label" for="auth-email">E-mailadres</label>
+        <input type="email" id="auth-email" placeholder="bijv. hero@example.com" required>
         
-        <label class="input-label" for="auth-pass">Password</label>
+        <label class="input-label" for="auth-pass">Wachtwoord</label>
         <div class="password-container">
-          <input type="password" id="auth-pass" placeholder="At least 6 characters" required>
+          <input type="password" id="auth-pass" placeholder="Minimaal 6 tekens" required>
           <button type="button" class="toggle-eye" id="eye-btn" onclick="togglePasswordVisibility('auth-pass', 'eye-btn')">👁️</button>
         </div>
 
-        <button type="submit" class="auth-btn" id="auth-submit-btn">Log In</button>
+        <button type="submit" class="auth-btn" id="auth-submit-btn">Inloggen</button>
       </form>
 
       <div class="auth-links">
-        <button type="button" class="auth-toggle" id="auth-toggle-btn" onclick="toggleAuthMode()">No account? Register here</button>
-        <button type="button" class="auth-forgot" id="auth-forgot-btn" onclick="sendPasswordReset()">Forgot password?</button>
+        <button type="button" class="auth-toggle" id="auth-toggle-btn" onclick="toggleAuthMode()">Geen account? Registreer hier</button>
+        <button type="button" class="auth-forgot" id="auth-forgot-btn" onclick="sendPasswordReset()">Wachtwoord vergeten?</button>
       </div>
     </div>
   </div>
@@ -194,12 +411,12 @@
   <div id="app-screen">
     <div class="header">
       <div class="top-bar">
-        <span>Hero: <strong id="user-display" style="color: var(--text);">Player</strong> <span id="network-status" class="status-tag">🟢 Online</span></span>
+        <span>Hero: <strong id="user-display" style="color: var(--text-main);">Player</strong> <span id="network-status" class="status-tag">🟢 Online</span></span>
         <div class="header-btns">
           <button class="icon-btn" onclick="openUpdatesModal()">✨ Updates</button>
           <button class="icon-btn" id="notif-toggle-btn" onclick="toggleNotificationSetting()">🔔 Notifs</button>
           <button class="icon-btn" onclick="startTutorial()">❓ Help</button>
-          <button class="icon-btn" onclick="logout()">🚪 Log Out</button>
+          <button class="icon-btn" onclick="logout()">🚪 Uitloggen</button>
         </div>
       </div>
 
@@ -229,17 +446,17 @@
     <div id="dailies" class="section active">
       <form class="add-form" onsubmit="addDaily(event)">
         <div class="form-row">
-          <input type="text" id="daily-title" placeholder="Daily habit (e.g., Brush teeth)..." required>
+          <input type="text" id="daily-title" placeholder="Dagelijkse gewoonte..." required>
         </div>
         <div class="form-row">
-          <div style="display: flex; align-items: center; gap: 4px; flex: 1; min-width: 100px;">
-            <span style="font-size: 0.8rem; color: var(--subtext); white-space: nowrap;">⏰ Time:</span>
-            <input type="time" id="daily-time" title="Optional time reminder">
+          <div style="display: flex; align-items: center; gap: 4px; flex: 1; min-width: 90px;">
+            <span style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap;">⏰ Tijd:</span>
+            <input type="time" id="daily-time" title="Optionele herinneringstijd">
           </div>
           <select id="daily-xp" style="flex: 1; min-width: 100px;">
-            <option value="5">⚡ Small (+5 XP)</option>
-            <option value="10" selected>🌱 Normal (+10 XP)</option>
-            <option value="15">🔥 Important (+15 XP)</option>
+            <option value="5">⚡ Klein (+5 XP)</option>
+            <option value="10" selected>🌱 Normaal (+10 XP)</option>
+            <option value="15">🔥 Belangrijk (+15 XP)</option>
           </select>
           <button type="submit" class="btn-add">+</button>
         </div>
@@ -251,15 +468,15 @@
     <div id="quests" class="section">
       <form class="add-form" onsubmit="addQuest(event)">
         <div class="form-row">
-          <input type="text" id="quest-title" placeholder="New quest/task..." required>
+          <input type="text" id="quest-title" placeholder="Nieuwe quest / taak..." required>
         </div>
         <div class="form-row">
           <select id="quest-type" onchange="toggleQuestInputs()" style="flex: 1;">
-            <option value="simple">⚡ Instant Complete</option>
-            <option value="counter">🔢 Counter / Count</option>
-            <option value="timer">⏱️ Timer (minutes)</option>
+            <option value="simple">⚡ Direct Voltooien</option>
+            <option value="counter">🔢 Teller / Aantal</option>
+            <option value="timer">⏱️ Timer (minuten)</option>
           </select>
-          <input type="number" id="quest-target" placeholder="Amount" value="8" min="1" style="width: 70px; display: none;">
+          <input type="number" id="quest-target" placeholder="Aantal" value="8" min="1" style="width: 70px; display: none;">
           <select id="quest-xp" style="width: 90px;">
             <option value="25">25 XP</option>
             <option value="50" selected>50 XP</option>
@@ -269,7 +486,7 @@
         </div>
 
         <div style="margin-top: 2px;">
-          <label for="quest-due" style="font-size: 0.8rem; color: var(--subtext); display: block; margin-bottom: 4px;">⏰ Deadline (optional):</label>
+          <label for="quest-due" style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-bottom: 4px; font-weight: 600;">⏰ Deadline (optioneel):</label>
           <div class="form-row">
             <input type="datetime-local" id="quest-due" style="width: 100%; flex: 1;">
             <button type="submit" class="btn-add">+</button>
@@ -283,13 +500,13 @@
     <div id="goals" class="section">
       <form class="add-form" onsubmit="addGoal(event)">
         <div class="form-row">
-          <input type="text" id="goal-title" placeholder="Major life goal..." required>
+          <input type="text" id="goal-title" placeholder="Groot levensdoel..." required>
         </div>
         <div class="form-row">
           <select id="goal-xp" style="flex: 1;">
-            <option value="250">🎯 Small Goal (+250 XP)</option>
-            <option value="500" selected>🏆 Medium Goal (+500 XP)</option>
-            <option value="1000">👑 Epic Goal (+1000 XP)</option>
+            <option value="250">🎯 Klein Doel (+250 XP)</option>
+            <option value="500" selected>🏆 Medium Doel (+500 XP)</option>
+            <option value="1000">👑 Episch Doel (+1000 XP)</option>
           </select>
           <button type="submit" class="btn-add">+</button>
         </div>
@@ -301,8 +518,8 @@
     <div id="shop" class="section">
       <form class="add-form" onsubmit="addShopItem(event)">
         <div class="form-row">
-          <input type="text" id="item-title" placeholder="Reward (e.g., 1 hour gaming)..." required>
-          <input type="number" id="item-cost" placeholder="Gold" style="width: 70px;" required>
+          <input type="text" id="item-title" placeholder="Beloning (bijv. 1u gamen)..." required>
+          <input type="number" id="item-cost" placeholder="Gold" style="width: 75px;" required>
           <button type="submit" class="btn-add">+</button>
         </div>
       </form>
@@ -313,64 +530,63 @@
   <div class="toast" id="toast"></div>
 
   <!-- UPDATE TOAST FOR SERVICE WORKER -->
-  <div id="update-toast" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#6366f1; color:white; padding:12px 20px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.6); z-index:9999; text-align:center; width: 90%; max-width: 400px; justify-content: space-between; align-items: center;">
-    <span style="font-size:0.85rem; font-weight:bold;">🚀 New update available!</span>
-    <button onclick="updateApp()" style="background:white; color:#6366f1; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left: 10px;">Update Now</button>
+  <div id="update-toast" style="display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #6366f1, #8b5cf6); color:white; padding:12px 20px; border-radius:14px; box-shadow:0 8px 25px rgba(99,102,241,0.5); z-index:9999; text-align:center; width: 90%; max-width: 400px; justify-content: space-between; align-items: center;">
+    <span style="font-size:0.85rem; font-weight:700;">🚀 Nieuwe update beschikbaar!</span>
+    <button onclick="updateApp()" style="background:white; color:#6366f1; border:none; padding:6px 14px; border-radius:8px; font-weight:800; cursor:pointer; margin-left: 10px;">Update Nu</button>
   </div>
 
-  <!-- UPDATES / WHAT'S NEW MODAL -->
+  <!-- UPDATES MODAL -->
   <div class="modal-overlay" id="updates-modal">
     <div class="modal-content">
-      <h3>✨ What's New in Life RPG</h3>
+      <h3>✨ Nieuw in Life RPG</h3>
       <div style="max-height: 320px; overflow-y: auto; margin-bottom: 16px; padding-right: 4px;">
         
-        <div style="border-bottom: 1px solid #3f3f46; padding-bottom: 10px; margin-bottom: 12px;">
-          <h4 style="color: var(--accent-gold); font-size: 0.95rem;">🚀 Version 7.0 (Latest)</h4>
+        <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 10px; margin-bottom: 12px;">
+          <h4 style="color: var(--accent-gold); font-size: 0.95rem;">🚀 Versie 8.0 (Vers Redesign)</h4>
           <ul class="help-step-list" style="margin-left: 16px; margin-top: 6px;">
-            <li><strong>📱 Layout Fixes:</strong> Perfected mobile layout so input forms never spill outside the screen.</li>
-            <li><strong>⏰ Daily Time Label:</strong> Added clear <code>⏰ Time:</code> indicator for daily habits.</li>
-            <li><strong>🔔 Scheduled Notifications:</strong> Receive automated push reminders right on time.</li>
-            <li><strong>⏳ Chronological Sorting:</strong> Dailies are sorted from earliest to latest based on scheduled time.</li>
+            <li><strong>✨ Clean UI Redesign:</strong> Een strak modern donker thema met verfijnde kaartstijlen, mooie verloopkleuren en strakke typografie.</li>
+            <li><strong>📱 Geoptimaliseerde Lay-out:</strong> Formulieren en keuzemenu's passen nu gegarandeerd perfect op alle mobiele schermen.</li>
+            <li><strong>⏰ Duidelijk Tijdslabel:</strong> Invoer voor gewoonte-tijden is voorzien van een heldere indicator.</li>
           </ul>
         </div>
 
       </div>
       <div class="modal-footer">
-        <button class="modal-btn" onclick="document.getElementById('updates-modal').style.display='none';">Got it! 👍</button>
+        <button class="modal-btn" onclick="document.getElementById('updates-modal').style.display='none';">Begrepen! 👍</button>
       </div>
     </div>
   </div>
 
-  <!-- HELP & TUTORIAL MODAL WITH TABS -->
+  <!-- HELP & TUTORIAL MODAL -->
   <div class="modal-overlay" id="tutorial-modal">
     <div class="modal-content">
       <div class="modal-nav-tabs">
-        <button class="modal-tab-btn active" id="modal-tab-tut" onclick="switchHelpTab('tut')">📖 Guide</button>
-        <button class="modal-tab-btn" id="modal-tab-notif" onclick="switchHelpTab('notif')">🔔 Notification Setup</button>
+        <button class="modal-tab-btn active" id="modal-tab-tut" onclick="switchHelpTab('tut')">📖 Handleiding</button>
+        <button class="modal-tab-btn" id="modal-tab-notif" onclick="switchHelpTab('notif')">🔔 Notificaties Instellen</button>
       </div>
 
       <!-- TAB 1: GUIDE -->
       <div id="help-sec-tut">
-        <h3 id="tut-title">Welcome Hero! 🛡️</h3>
-        <p id="tut-body">Turn your real life into an RPG! Complete tasks, level up, earn gold, and reward yourself.</p>
+        <h3 id="tut-title">Welkom Hero! 🛡️</h3>
+        <p id="tut-body">Maak van je echte leven een RPG! Voltooi taken, stijg in niveau, verdien goud en beloon jezelf.</p>
         <div class="modal-footer">
-          <button class="modal-btn" id="tut-btn" onclick="nextTutorialStep()">Next ➡️</button>
+          <button class="modal-btn" id="tut-btn" onclick="nextTutorialStep()">Volgende ➡️</button>
         </div>
       </div>
 
       <!-- TAB 2: NOTIFICATION INSTRUCTIONS -->
       <div id="help-sec-notif" style="display: none;">
-        <h3>🔔 Enabling Notifications</h3>
-        <p>Follow these steps to receive notifications for reminders and deadlines:</p>
+        <h3>🔔 Notificaties Inschakelen</h3>
+        <p>Volg deze stappen om herinneringen en deadline-meldingen te ontvangen:</p>
         
         <ol class="help-step-list">
-          <li><strong>Step 1: In-App Button</strong><br>Click the <code>🔔 Notifs</code> button at the top right of the app. Tap <em>"Allow"</em> when prompted by your browser/phone.</li>
-          <li><strong>📱 For iPhone (iOS):</strong><br>Notifications on iOS only work if you add the app to your Home Screen! In Safari, tap the <em>'Share'</em> icon at the bottom ➔ Choose <em>'Add to Home Screen'</em>. Launch the app from your home screen and enable notifications.</li>
-          <li><strong>🤖 For Android / Chrome:</strong><br>If you accidentally tapped 'Block': Tap the lock/settings icon next to the URL bar ➔ Select <em>Site Settings</em> ➔ Change <em>Notifications</em> to <em>Allow</em>.</li>
+          <li><strong>Stap 1: In-App Knop</strong><br>Klik bovenaan de app op <code>🔔 Notifs</code> en kies <em>"Toestaan"</em>.</li>
+          <li><strong>📱 Voor iPhone (iOS):</strong><br>Notificaties op iOS werken alleen als je de app toevoegt aan je Scherm! Tik in Safari op het <em>'Delen'</em> icoon ➔ Kies <em>'Zet op het basisscherm'</em>. Open de app vanaf daar.</li>
+          <li><strong>🤖 Voor Android / Chrome:</strong><br>Per ongeluk geblokkeerd? Tik op het slotje in de adresbalk ➔ <em>Site-instellingen</em> ➔ Wijzig <em>Meldingen</em> naar <em>Toestaan</em>.</li>
         </ol>
 
         <div class="modal-footer">
-          <button class="modal-btn" onclick="document.getElementById('tutorial-modal').style.display='none';">Got it! 👍</button>
+          <button class="modal-btn" onclick="document.getElementById('tutorial-modal').style.display='none';">Begrepen! 👍</button>
         </div>
       </div>
 
@@ -380,7 +596,7 @@
   <script>
     let isRegisterMode = false;
 
-    // TITLES & RANKS UP TO LEVEL 1000
+    // TITELS & RANKS UP TO LEVEL 1000
     function getPlayerTitle(level) {
       if (level >= 1000) return '🌌👑 Ultimate Life RPG God';
       if (level >= 900)  return '👁️ Immortal Overlord';
@@ -417,22 +633,22 @@
 
     function toggleAuthMode() {
       isRegisterMode = !isRegisterMode;
-      document.getElementById('auth-title').innerText = isRegisterMode ? '✨ CREATE Account' : '🎮 Welcome to Life RPG';
-      document.getElementById('auth-sub').innerText = isRegisterMode ? 'Register a new account to get started' : 'Log in to continue';
-      document.getElementById('auth-submit-btn').innerText = isRegisterMode ? 'Register' : 'Log In';
-      document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? 'Already have an account? Log in' : 'No account? Register here';
+      document.getElementById('auth-title').innerText = isRegisterMode ? '✨ Account Maken' : '🎮 Life RPG';
+      document.getElementById('auth-sub').innerText = isRegisterMode ? 'Registreer een nieuw account om te beginnen' : 'Log in om verder te gaan';
+      document.getElementById('auth-submit-btn').innerText = isRegisterMode ? 'Registreren' : 'Inloggen';
+      document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? 'Al een account? Log in' : 'Geen account? Registreer hier';
     }
 
     function sendPasswordReset() {
-      const email = prompt('Enter your email address for a password reset link:');
+      const email = prompt('Vul je e-mailadres in voor een resetlink:');
       if (email) {
         if (typeof auth === 'undefined' || !auth) {
-          alert('Firebase is not initialized!');
+          alert('Firebase is niet geïnitialiseerd!');
           return;
         }
         auth.sendPasswordResetEmail(email.trim())
-          .then(() => alert('Reset email sent! Check your inbox.'))
-          .catch(err => alert('Error: ' + err.message));
+          .then(() => alert('Reset e-mail verzonden! Check je inbox.'))
+          .catch(err => alert('Fout: ' + err.message));
       }
     }
 
@@ -458,17 +674,17 @@
       const isSavedOn = userData && userData.notificationsEnabled === true;
 
       if (isGranted && isSavedOn) {
-        btn.innerHTML = '🔔 Notifs: ON';
+        btn.innerHTML = '🔔 Notifs: AAN';
         btn.classList.add('active-notif');
       } else {
-        btn.innerHTML = '🔔 Notifs: OFF';
+        btn.innerHTML = '🔔 Notifs: UIT';
         btn.classList.remove('active-notif');
       }
     }
 
     async function toggleNotificationSetting() {
       if (!('Notification' in window)) {
-        alert('Your browser unfortunately does not support notifications.');
+        alert('Je browser ondersteunt helaas geen notificaties.');
         return;
       }
 
@@ -476,17 +692,17 @@
         userData.notificationsEnabled = !userData.notificationsEnabled;
         save();
         syncNotificationUI();
-        showToast(userData.notificationsEnabled ? '🔔 Notifications ON' : '🔕 Notifications OFF');
+        showToast(userData.notificationsEnabled ? '🔔 Notificaties AAN' : '🔕 Notificaties UIT');
       } else {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
           userData.notificationsEnabled = true;
           save();
           syncNotificationUI();
-          showToast('🔔 Notifications enabled!');
-          sendNotification('🎮 Life RPG', 'Notifications successfully activated!');
+          showToast('🔔 Notificaties ingeschakeld!');
+          sendNotification('🎮 Life RPG', 'Notificaties zijn succesvol geactiveerd!');
         } else {
-          alert('Notifications are blocked in your browser. Check the Help screen to see how to enable them.');
+          alert('Notificaties zijn geblokkeerd in je browser. Bekijk het Help-scherm om ze toe te staan.');
           userData.notificationsEnabled = false;
           save();
           syncNotificationUI();
@@ -543,19 +759,19 @@
       hasSeenTutorial: false,
       lastResetDate: new Date().toDateString(),
       dailies: [
-        { id: 101, title: 'Wake up early ⏰', time: '07:00', xp: 15, gold: 6, completedToday: false, notifiedToday: false },
-        { id: 102, title: 'Brush teeth 🪥', time: '08:00', xp: 10, gold: 4, completedToday: false, notifiedToday: false },
-        { id: 103, title: 'Take a shower 🚿', time: '08:30', xp: 10, gold: 4, completedToday: false, notifiedToday: false }
+        { id: 101, title: 'Vroeg opstaan ⏰', time: '07:00', xp: 15, gold: 6, completedToday: false, notifiedToday: false },
+        { id: 102, title: 'Tanden poetsen 🪥', time: '08:00', xp: 10, gold: 4, completedToday: false, notifiedToday: false },
+        { id: 103, title: 'Douchen 🚿', time: '08:30', xp: 10, gold: 4, completedToday: false, notifiedToday: false }
       ],
       quests: [
-        { id: 1, title: 'Drink 8 glasses of water', type: 'counter', current: 0, target: 8, xp: 50, gold: 20 },
-        { id: 2, title: 'Clean room', type: 'simple', xp: 100, gold: 40 }
+        { id: 1, title: 'Drink 8 glazen water', type: 'counter', current: 0, target: 8, xp: 50, gold: 20 },
+        { id: 2, title: 'Kamer opruimen', type: 'simple', xp: 100, gold: 40 }
       ],
       goals: [
-        { id: 1, title: "Get driver's license 🚗", xp: 1000, gold: 400 }
+        { id: 1, title: "Rijbewijs halen 🚗", xp: 1000, gold: 400 }
       ],
       shop: [
-        { id: 1, title: '1 hour gaming', cost: 30 }
+        { id: 1, title: '1 uur gamen', cost: 30 }
       ]
     };
 
@@ -599,7 +815,7 @@
                 await database.ref('users/' + user.uid).set(userData);
               }
             } catch (err) {
-              console.log('Could not fetch cloud data, using local data.');
+              console.log('Kon clouddata niet ophalen, lokale data gebruikt.');
             }
           }
 
@@ -624,7 +840,7 @@
 
     async function handleAuth(e) {
       e.preventDefault();
-      if (!auth) { alert("Firebase is not initialized!"); return; }
+      if (!auth) { alert("Firebase is niet geïnitialiseerd!"); return; }
 
       const email = document.getElementById('auth-email').value.trim();
       const pass = document.getElementById('auth-pass').value.trim();
@@ -632,13 +848,13 @@
       try {
         if (isRegisterMode) {
           await auth.createUserWithEmailAndPassword(email, pass);
-          showToast('Account created! Welcome!');
+          showToast('Account aangemaakt! Welkom!');
         } else {
           await auth.signInWithEmailAndPassword(email, pass);
-          showToast('Welcome back!');
+          showToast('Welkom terug!');
         }
       } catch (err) {
-        alert('Authentication Error: ' + err.message);
+        alert('Authenticatie Fout: ' + err.message);
       }
     }
 
@@ -675,7 +891,7 @@
         try {
           await database.ref('users/' + currentUser.uid).set(userData);
         } catch (e) {
-          console.error('Cloud sync failed:', e);
+          console.error('Cloud synchronisatie mislukt:', e);
         }
       }
     }
@@ -686,14 +902,14 @@
       render();
     }
 
-    // HELP & TUTORIAL SYSTEM WITH TABS
+    // TUTORIAL SYSTEM WITH TABS
     let tutStep = 0;
     const tutSteps = [
-      { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily habits, level up, earn gold, and reward yourself." },
-      { title: "📅 Daily Habits (Dailies)", body: "In the 'Dailies' tab, set up your daily habits. You can give them a scheduled time! Tasks are automatically sorted chronologically from morning to evening." },
-      { title: "⚔️ Quests & Deadlines", body: "Use Quests for one-time tasks. You can set a counter, use a timer, or add a specific deadline. Tasks with an early deadline automatically appear at the top!" },
-      { title: "🎯 Life Goals (Goals)", body: "Set long-term goals (like passing an exam or getting your driver's license). These grant huge XP and Gold bonuses!" },
-      { title: "🛒 The Shop", body: "Use your hard-earned Gold to buy custom rewards that you set up yourself (e.g., 1 hour of gaming or watching a movie)." }
+      { title: "Welkom Hero! 🛡️", body: "Maak van je echte leven een RPG! Voltooi dagelijkse gewoontes, stijg in niveau, verdien goud en beloon jezelf." },
+      { title: "📅 Dagelijkse Gewoontes (Dailies)", body: "Stel gewoontes in die je elke dag wilt doen. Je kunt er een geplande tijd aan koppelen! Taken worden automatisch chronologisch gesorteerd." },
+      { title: "⚔️ Quests & Deadlines", body: "Gebruik Quests voor eenmalige taken. Je kunt een teller gebruiken, een timer aanzetten of een specifieke deadline instellen." },
+      { title: "🎯 Levensdoelen (Goals)", body: "Stel lange-termijn doelen in (zoals een examen halen of je rijbewijs). Deze leveren grote XP- en Gold-bonussen op!" },
+      { title: "🛒 De Shop", body: "Gebruik je verdiende Gold om beloningen te kopen die je voor jezelf hebt ingesteld (bijv. 1 uur gamen)." }
     ];
 
     function startTutorial() {
@@ -713,7 +929,7 @@
     function showTutStep() {
       document.getElementById('tut-title').innerText = tutSteps[tutStep].title;
       document.getElementById('tut-body').innerText = tutSteps[tutStep].body;
-      document.getElementById('tut-btn').innerText = tutStep === tutSteps.length - 1 ? "Get Started! 🚀" : "Next ➡️";
+      document.getElementById('tut-btn').innerText = tutStep === tutSteps.length - 1 ? "Aan de slag! 🚀" : "Volgende ➡️";
     }
 
     function nextTutorialStep() {
@@ -739,11 +955,11 @@
       const targetInput = document.getElementById('quest-target');
       if (type === 'counter') {
         targetInput.style.display = 'block';
-        targetInput.placeholder = 'Amount';
+        targetInput.placeholder = 'Aantal';
         targetInput.value = 8;
       } else if (type === 'timer') {
         targetInput.style.display = 'block';
-        targetInput.placeholder = 'Minutes';
+        targetInput.placeholder = 'Minuten';
         targetInput.value = 15;
       } else {
         targetInput.style.display = 'none';
@@ -771,11 +987,10 @@
       document.getElementById('max-xp').innerText = maxXp;
       document.getElementById('xp-bar').style.width = `${Math.min((userData.xp / maxXp) * 100, 100)}%`;
 
-      // 1. RENDER DAILIES (SORTED CHRONOLOGICALLY BY TIME)
+      // 1. DAILIES (SORTED CHRONOLOGICALLY)
       const dailyList = document.getElementById('daily-list');
       const activeDailies = (userData.dailies || []).filter(d => !d.completedToday);
 
-      // Sort by scheduled time (earliest first; tasks without time at bottom)
       activeDailies.sort((a, b) => {
         if (!a.time && !b.time) return 0;
         if (!a.time) return 1;
@@ -784,7 +999,7 @@
       });
 
       dailyList.innerHTML = activeDailies.length === 0 
-        ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">🎉 All Dailies for today are completed!</p>' 
+        ? '<p style="color:var(--text-muted); text-align:center; padding: 24px 0; font-weight: 600;">🎉 Alle Dailies voor vandaag volbracht!</p>' 
         : '';
       
       activeDailies.forEach(d => {
@@ -796,14 +1011,14 @@
               <p><span class="badge-xp">+${d.xp} XP</span> • <span class="badge-gold">+${d.gold} Gold</span>${timeBadge}</p>
             </div>
             <div class="actions">
-              <button class="btn-action" style="background:var(--success); color:white;" onclick="completeDaily(${d.id})">✓ Complete</button>
+              <button class="btn-action" style="background:var(--success); color:white; border:none;" onclick="completeDaily(${d.id})">✓ Voltooid</button>
               <button class="btn-delete" onclick="deleteDaily(${d.id})">🗑️</button>
             </div>
           </div>
         `;
       });
 
-      // 2. RENDER QUESTS (CHRONOLOGICAL ORDER: EARLIEST DEADLINE AT TOP)
+      // 2. QUESTS (SORTED BY DEADLINE)
       const questList = document.getElementById('quest-list');
       const rawQuests = userData.quests || [];
       
@@ -814,7 +1029,7 @@
         return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
       });
 
-      questList.innerHTML = sortedQuests.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No active quests.</p>' : '';
+      questList.innerHTML = sortedQuests.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding: 24px 0; font-weight: 600;">Geen actieve quests.</p>' : '';
       
       sortedQuests.forEach(q => {
         let actionButtons = '';
@@ -828,7 +1043,7 @@
         }
 
         if (q.type === 'counter') {
-          extraBadge = ` • <span class="badge-progress">Progress: ${q.current}/${q.target}</span>`;
+          extraBadge = ` • <span class="badge-progress">Voortgang: ${q.current}/${q.target}</span>`;
           actionButtons = `
             <button class="btn-minus" onclick="decrementCounter(${q.id})">-1</button>
             <button class="btn-count" onclick="incrementCounter(${q.id})">+1</button> 
@@ -839,7 +1054,7 @@
           const playBtnText = q.isRunning ? '⏸️' : '▶️';
           actionButtons = `<button class="btn-timer" onclick="toggleTimer(${q.id})">${playBtnText}</button> <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>`;
         } else {
-          actionButtons = `<button class="btn-action" onclick="completeQuest(${q.id})">✓ Complete</button>`;
+          actionButtons = `<button class="btn-action" style="background:var(--accent); color:white; border:none;" onclick="completeQuest(${q.id})">✓ Voltooid</button>`;
         }
 
         questList.innerHTML += `
@@ -856,10 +1071,10 @@
         `;
       });
 
-      // 3. RENDER GOALS
+      // 3. GOALS
       const goalList = document.getElementById('goal-list');
       const goals = userData.goals || [];
-      goalList.innerHTML = goals.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No goals set.</p>' : '';
+      goalList.innerHTML = goals.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding: 24px 0; font-weight: 600;">Geen doelen ingesteld.</p>' : '';
       goals.forEach(g => {
         goalList.innerHTML += `
           <div class="card goal-card">
@@ -868,17 +1083,17 @@
               <p><span class="badge-xp">+${g.xp} XP</span> • <span class="badge-gold">+${g.gold} Gold</span></p>
             </div>
             <div class="actions">
-              <button class="btn-action" style="background:var(--goal-accent); color:white;" onclick="completeGoal(${g.id})">🏆 Complete</button>
+              <button class="btn-action" style="background:var(--goal-accent); color:white; border:none;" onclick="completeGoal(${g.id})">🏆 Voltooien</button>
               <button class="btn-delete" onclick="deleteGoal(${g.id})">🗑️</button>
             </div>
           </div>
         `;
       });
 
-      // 4. RENDER SHOP
+      // 4. SHOP
       const shopList = document.getElementById('shop-list');
       const shop = userData.shop || [];
-      shopList.innerHTML = shop.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No rewards in the shop.</p>' : '';
+      shopList.innerHTML = shop.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding: 24px 0; font-weight: 600;">Geen beloningen in de shop.</p>' : '';
       shop.forEach(s => {
         shopList.innerHTML += `
           <div class="card">
@@ -887,7 +1102,7 @@
               <p><span class="badge-gold">${s.cost} Gold</span></p>
             </div>
             <div class="actions">
-              <button class="btn-action" onclick="buyItem(${s.id})">Buy</button>
+              <button class="btn-action" style="background:var(--accent-gold); color:#0f172a; border:none; font-weight:800;" onclick="buyItem(${s.id})">Kopen</button>
               <button class="btn-delete" onclick="deleteShopItem(${s.id})">🗑️</button>
             </div>
           </div>
@@ -895,7 +1110,7 @@
       });
     }
 
-    // DAILIES ACTIONS
+    // ACTIONS
     function addDaily(e) {
       e.preventDefault();
       const title = document.getElementById('daily-title').value;
@@ -932,7 +1147,6 @@
       save();
     }
 
-    // QUESTS & GOALS ACTIONS
     function addQuest(e) {
       e.preventDefault();
       const title = document.getElementById('quest-title').value;
@@ -971,7 +1185,7 @@
       if (!q) return;
       q.current += 1;
       if (q.current >= q.target) completeQuest(id);
-      else { save(); showToast(`Progress: ${q.current}/${q.target}!`); }
+      else { save(); showToast(`Voortgang: ${q.current}/${q.target}!`); }
     }
 
     function decrementCounter(id) {
@@ -980,7 +1194,7 @@
       if (q.current > 0) {
         q.current -= 1;
         save();
-        showToast(`Progress: ${q.current}/${q.target}`);
+        showToast(`Voortgang: ${q.current}/${q.target}`);
       }
     }
 
@@ -1019,7 +1233,7 @@
     function completeGoal(id) {
       const goal = userData.goals.find(g => g.id === id);
       if (!goal) return;
-      if (confirm(`Completed: "${goal.title}"?`)) {
+      if (confirm(`Voltooid: "${goal.title}"?`)) {
         addRewards(goal.xp, goal.gold);
         userData.goals = userData.goals.filter(g => g.id !== id);
         save();
@@ -1045,9 +1259,9 @@
       if (!item) return;
       if (userData.gold >= item.cost) {
         userData.gold -= item.cost;
-        showToast(`Purchased: ${item.title}! 🎁`);
+        showToast(`Gekocht: ${item.title}! 🎁`);
         save();
-      } else alert('Not enough gold!');
+      } else alert('Niet genoeg goud!');
     }
 
     function deleteShopItem(id) { userData.shop = userData.shop.filter(s => s.id !== id); save(); }
@@ -1059,7 +1273,7 @@
       setTimeout(() => toast.style.display = 'none', 3000);
     }
 
-    // INTERVAL FOR TIMERS, DEADLINES, SCHEDULED DAILIES & AUTOMATIC MIDNIGHT RESET
+    // CHECK INTERVAL FOR TIMERS, DEADLINES & NOTIFICATIONS
     setInterval(() => {
       if (!userData) return;
       
@@ -1079,7 +1293,7 @@
           if (d.time && !d.completedToday && !d.notifiedToday && d.time === currentTimeStr) {
             d.notifiedToday = true;
             hasChanges = true;
-            sendNotification('📅 Scheduled Daily Habit', `Time to complete: "${d.title}"!`);
+            sendNotification('📅 Geplande Gewoonte', `Tijd voor: "${d.title}"!`);
           }
         });
       }
@@ -1094,12 +1308,12 @@
             if (timeLeft > 0 && timeLeft <= 15 * 60 * 1000 && !q.warned) {
               q.warned = true;
               hasChanges = true;
-              sendNotification('⏰ Deadline approaching!', `Less than 15 minutes left for: "${q.title}"!`);
+              sendNotification('⏰ Deadline nadert!', `Nog minder dan 15 min voor: "${q.title}"!`);
             }
 
             if (now >= dueTime) {
-              showToast(`❌ Quest expired: "${q.title}"!`);
-              sendNotification('❌ Quest Expired', `The deadline for "${q.title}" has passed.`);
+              showToast(`❌ Quest verlopen: "${q.title}"!`);
+              sendNotification('❌ Quest Verlopen', `De deadline voor "${q.title}" is verstreken.`);
               hasChanges = true;
               return false;
             }
@@ -1115,7 +1329,7 @@
               if (disp) disp.innerText = `⏱️ ${formatTime(q.remainingSeconds)}`;
             } else {
               q.isRunning = false;
-              sendNotification('⏱️ Timer Finished!', `The timer for "${q.title}" is done!`);
+              sendNotification('⏱️ Timer Afgelopen!', `De timer voor "${q.title}" is klaar!`);
               completeQuest(q.id);
             }
           }
