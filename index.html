@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>My Life RPG</title>
 
-  <!-- Howler.js library for audio -->
+  <!-- Howler.js sound library -->
   <script src="https://cdn.jsdelivr.net/npm/howler@2.2.3/dist/howler.min.js" crossorigin="anonymous"></script>
 
   <!-- Firebase Web SDK -->
@@ -72,7 +72,8 @@
     .xp-text { font-size: 0.8rem; color: var(--subtext); text-align: right; }
 
     .header-btns { display: flex; gap: 6px; }
-    .icon-btn { background: #2d2d35; border: none; color: var(--text); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+    .icon-btn { background: #2d2d35; border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 4px; }
+    .icon-btn.active-notif { background: #059669; color: white; }
 
     /* Tabs Navigation */
     .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
@@ -103,7 +104,6 @@
     .card { background: var(--card); border: 1px solid #2d2d35; padding: 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
     .card.goal-card { border-left: 4px solid var(--goal-accent); }
     .card.daily-card { border-left: 4px solid var(--daily-accent); }
-    .card.completed-card { opacity: 0.5; filter: grayscale(50%); }
     
     .card-info h4 { margin-bottom: 4px; font-size: 1rem; }
     .card-info p { font-size: 0.8rem; color: var(--subtext); }
@@ -124,11 +124,20 @@
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 100; text-align: center; }
 
     /* MODALS */
-    .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; padding: 20px; z-index: 200; }
-    .modal-content { background: var(--card); border: 1px solid var(--accent); padding: 20px; border-radius: 16px; max-width: 400px; width: 100%; text-align: center; }
-    .modal-content h3 { color: var(--accent); margin-bottom: 10px; }
-    .modal-content p { color: var(--subtext); font-size: 0.95rem; line-height: 1.4; margin-bottom: 20px; }
-    .modal-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; padding: 20px; z-index: 200; }
+    .modal-content { background: var(--card); border: 1px solid var(--accent); padding: 20px; border-radius: 16px; max-width: 440px; width: 100%; text-align: left; }
+    .modal-content h3 { color: var(--accent); margin-bottom: 10px; text-align: center; }
+    .modal-content p { color: var(--subtext); font-size: 0.9rem; line-height: 1.4; margin-bottom: 12px; }
+    
+    .modal-nav-tabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid #3f3f46; padding-bottom: 8px; }
+    .modal-tab-btn { flex: 1; background: #2d2d35; border: none; color: var(--subtext); padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; text-align: center; }
+    .modal-tab-btn.active { background: var(--accent); color: white; }
+
+    .help-step-list { margin-left: 20px; color: var(--text); font-size: 0.85rem; line-height: 1.6; margin-bottom: 14px; }
+    .help-step-list li { margin-bottom: 6px; }
+
+    .modal-footer { display: flex; justify-content: center; margin-top: 16px; }
+    .modal-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
   </style>
 </head>
 <body>
@@ -137,11 +146,11 @@
   <div id="auth-screen">
     <div class="auth-card">
       <h2 id="auth-title">🎮 Welcome to Life RPG</h2>
-      <p class="subtitle" id="auth-sub">Log in with your account to continue</p>
+      <p class="subtitle" id="auth-sub">Log in to continue with your hero</p>
       
       <form onsubmit="handleAuth(event)">
         <label class="input-label" for="auth-email">Email Address</label>
-        <input type="email" id="auth-email" placeholder="e.g. hero@example.com" required>
+        <input type="email" id="auth-email" placeholder="e.g., hero@example.com" required>
         
         <label class="input-label" for="auth-pass">Password</label>
         <div class="password-container">
@@ -149,11 +158,11 @@
           <button type="button" class="toggle-eye" id="eye-btn" onclick="togglePasswordVisibility('auth-pass', 'eye-btn')">👁️</button>
         </div>
 
-        <button type="submit" class="auth-btn" id="auth-submit-btn">Login</button>
+        <button type="submit" class="auth-btn" id="auth-submit-btn">Log In</button>
       </form>
 
       <div class="auth-links">
-        <button type="button" class="auth-toggle" id="auth-toggle-btn" onclick="toggleAuthMode()">Need an account? Register here</button>
+        <button type="button" class="auth-toggle" id="auth-toggle-btn" onclick="toggleAuthMode()">No account? Register here</button>
         <button type="button" class="auth-forgot" id="auth-forgot-btn" onclick="sendPasswordReset()">Forgot password?</button>
       </div>
     </div>
@@ -165,9 +174,9 @@
       <div class="top-bar">
         <span>Hero: <strong id="user-display" style="color: var(--text);">Player</strong> <span id="network-status" class="status-tag">🟢 Online</span></span>
         <div class="header-btns">
-          <button class="icon-btn" onclick="requestNotificationPermission()">🔔 Notifications</button>
+          <button class="icon-btn" id="notif-toggle-btn" onclick="toggleNotificationSetting()">🔔 Notifications</button>
           <button class="icon-btn" onclick="startTutorial()">❓ Help</button>
-          <button class="icon-btn" onclick="logout()">🚪 Logout</button>
+          <button class="icon-btn" onclick="logout()">🚪 Log Out</button>
         </div>
       </div>
 
@@ -185,7 +194,7 @@
       <div class="xp-text"><span id="current-xp">0</span> / <span id="max-xp">100</span> XP</div>
     </div>
 
-    <!-- Tab Navigation -->
+    <!-- Navigation Tabs -->
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('dailies', this)">📅 Dailies</button>
       <button class="tab-btn" onclick="switchTab('quests', this)">⚔️ Quests</button>
@@ -197,7 +206,7 @@
     <div id="dailies" class="section active">
       <form class="add-form" onsubmit="addDaily(event)">
         <div class="form-row">
-          <input type="text" id="daily-title" placeholder="Daily habit (e.g. Brush teeth)..." required>
+          <input type="text" id="daily-title" placeholder="Daily habit (e.g., Brush teeth)..." required>
         </div>
         <div class="form-row">
           <select id="daily-xp" style="flex: 1;">
@@ -223,7 +232,7 @@
             <option value="counter">🔢 Counter / Count</option>
             <option value="timer">⏱️ Timer (minutes)</option>
           </select>
-          <input type="number" id="quest-target" placeholder="Count" value="8" min="1" style="width: 80px; display: none;">
+          <input type="number" id="quest-target" placeholder="Amount" value="8" min="1" style="width: 80px; display: none;">
           <select id="quest-xp" style="width: 90px;">
             <option value="25">25 XP</option>
             <option value="50" selected>50 XP</option>
@@ -265,7 +274,7 @@
     <div id="shop" class="section">
       <form class="add-form" onsubmit="addShopItem(event)">
         <div class="form-row">
-          <input type="text" id="item-title" placeholder="Reward (e.g. 1hr gaming)..." required>
+          <input type="text" id="item-title" placeholder="Reward (e.g., 1 hour gaming)..." required>
           <input type="number" id="item-cost" placeholder="Gold" style="width: 80px;" required>
           <button type="submit" class="btn-add">+</button>
         </div>
@@ -276,24 +285,52 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- UPDATE NOTIFICATION TOAST -->
+  <!-- UPDATE TOAST -->
   <div id="update-toast" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#6366f1; color:white; padding:12px 20px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.6); z-index:9999; text-align:center; width: 90%; max-width: 400px; justify-content: space-between; align-items: center;">
     <span style="font-size:0.85rem; font-weight:bold;">🚀 New update available!</span>
     <button onclick="updateApp()" style="background:white; color:#6366f1; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left: 10px;">Update Now</button>
   </div>
 
-  <!-- TUTORIAL MODAL -->
+  <!-- HELP & TUTORIAL MODAL WITH TABS -->
   <div class="modal-overlay" id="tutorial-modal">
     <div class="modal-content">
-      <h3 id="tut-title">Welcome Hero! 🛡️</h3>
-      <p id="tut-body">Turn your real life into an RPG! Complete daily tasks, level up, earn gold, and reward yourself.</p>
-      <button class="modal-btn" id="tut-btn" onclick="nextTutorialStep()">Next ➡️</button>
+      <div class="modal-nav-tabs">
+        <button class="modal-tab-btn active" id="modal-tab-tut" onclick="switchHelpTab('tut')">📖 Guide</button>
+        <button class="modal-tab-btn" id="modal-tab-notif" onclick="switchHelpTab('notif')">🔔 Notification Setup</button>
+      </div>
+
+      <!-- TAB 1: GUIDE -->
+      <div id="help-sec-tut">
+        <h3 id="tut-title">Welcome Hero! 🛡️</h3>
+        <p id="tut-body">Turn your real life into an RPG! Complete tasks, level up, earn gold, and reward yourself.</p>
+        <div class="modal-footer">
+          <button class="modal-btn" id="tut-btn" onclick="nextTutorialStep()">Next ➡️</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: NOTIFICATION INSTRUCTIONS -->
+      <div id="help-sec-notif" style="display: none;">
+        <h3>🔔 Enabling Notifications</h3>
+        <p>Follow these steps to receive notifications for reminders and deadlines:</p>
+        
+        <ol class="help-step-list">
+          <li><strong>Step 1: In-App Button</strong><br>Click the <code>🔔 Notifications</code> button at the top right of the app. Tap <em>"Allow"</em> when prompted by your browser/phone.</li>
+          <li><strong>📱 For iPhone (iOS):</strong><br>Notifications on iOS only work if you add the app to your Home Screen! In Safari, tap the <em>'Share'</em> icon at the bottom ➔ Choose <em>'Add to Home Screen'</em>. Launch the app from your home screen and enable notifications.</li>
+          <li><strong>🤖 For Android / Chrome:</strong><br>If you accidentally tapped 'Block': Tap the lock/settings icon next to the URL bar ➔ Select <em>Site Settings</em> ➔ Change <em>Notifications</em> to <em>Allow</em>.</li>
+        </ol>
+
+        <div class="modal-footer">
+          <button class="modal-btn" onclick="document.getElementById('tutorial-modal').style.display='none';">Got it! 👍</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <script>
     let isRegisterMode = false;
 
+    // TITLES & RANKS UP TO LEVEL 1000
     function getPlayerTitle(level) {
       if (level >= 1000) return '🌌👑 Ultimate Life RPG God';
       if (level >= 900)  return '👁️ Immortal Overlord';
@@ -330,21 +367,21 @@
 
     function toggleAuthMode() {
       isRegisterMode = !isRegisterMode;
-      document.getElementById('auth-title').innerText = isRegisterMode ? '✨ Create Account' : '🎮 Welcome to Life RPG';
-      document.getElementById('auth-sub').innerText = isRegisterMode ? 'Register a new account to get started' : 'Log in with your account to continue';
-      document.getElementById('auth-submit-btn').innerText = isRegisterMode ? 'Register' : 'Login';
-      document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? 'Already have an account? Login' : 'Need an account? Register here';
+      document.getElementById('auth-title').innerText = isRegisterMode ? '✨ CREATE Account' : '🎮 Welcome to Life RPG';
+      document.getElementById('auth-sub').innerText = isRegisterMode ? 'Register a new account to get started' : 'Log in to continue';
+      document.getElementById('auth-submit-btn').innerText = isRegisterMode ? 'Register' : 'Log In';
+      document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? 'Already have an account? Log in' : 'No account? Register here';
     }
 
     function sendPasswordReset() {
-      const email = prompt('Enter your email address to receive a password reset link:');
+      const email = prompt('Enter your email address for a password reset link:');
       if (email) {
         if (typeof auth === 'undefined' || !auth) {
           alert('Firebase is not initialized!');
           return;
         }
         auth.sendPasswordResetEmail(email.trim())
-          .then(() => alert('Password reset email sent! Check your inbox.'))
+          .then(() => alert('Reset email sent! Check your inbox.'))
           .catch(err => alert('Error: ' + err.message));
       }
     }
@@ -361,24 +398,51 @@
       }
     }
 
-    function requestNotificationPermission() {
+    // FIX: PERMANENT NOTIFICATION STATUS & ACCURATE STORAGE
+    function syncNotificationUI() {
+      const btn = document.getElementById('notif-toggle-btn');
+      const isGranted = 'Notification' in window && Notification.permission === 'granted';
+      const isSavedOn = userData && userData.notificationsEnabled === true;
+
+      if (isGranted && isSavedOn) {
+        btn.innerHTML = '🔔 Notifications: ON';
+        btn.classList.add('active-notif');
+      } else {
+        btn.innerHTML = '🔔 Notifications: OFF';
+        btn.classList.remove('active-notif');
+      }
+    }
+
+    async function toggleNotificationSetting() {
       if (!('Notification' in window)) {
-        alert('Your browser does not support notifications.');
+        alert('Your browser unfortunately does not support notifications.');
         return;
       }
 
-      Notification.requestPermission().then(permission => {
+      if (Notification.permission === 'granted') {
+        userData.notificationsEnabled = !userData.notificationsEnabled;
+        save();
+        syncNotificationUI();
+        showToast(userData.notificationsEnabled ? '🔔 Notifications ON' : '🔕 Notifications OFF');
+      } else {
+        const permission = await Notification.requestPermission();
         if (permission === 'granted') {
-          showToast('🔔 Notifications turned ON!');
-          sendNotification('🎮 Life RPG', 'Notifications enabled successfully!');
-        } else if (permission === 'denied') {
-          alert('Notifications are blocked.');
+          userData.notificationsEnabled = true;
+          save();
+          syncNotificationUI();
+          showToast('🔔 Notifications enabled!');
+          sendNotification('🎮 Life RPG', 'Notifications successfully activated!');
+        } else {
+          alert('Notifications are blocked in your browser. Check the Help screen to see how to enable them.');
+          userData.notificationsEnabled = false;
+          save();
+          syncNotificationUI();
         }
-      });
+      }
     }
 
     function sendNotification(title, body) {
-      if ('Notification' in window && Notification.permission === 'granted') {
+      if ('Notification' in window && Notification.permission === 'granted' && userData && userData.notificationsEnabled) {
         if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
           navigator.serviceWorker.ready.then(reg => {
             reg.showNotification(title, {
@@ -422,6 +486,7 @@
       xp: 0,
       level: 1,
       gold: 0,
+      notificationsEnabled: false,
       hasSeenTutorial: false,
       lastResetDate: new Date().toDateString(),
       dailies: [
@@ -437,7 +502,7 @@
         { id: 1, title: "Get driver's license 🚗", xp: 1000, gold: 400 }
       ],
       shop: [
-        { id: 1, title: 'Watch 1 TV episode', cost: 30 }
+        { id: 1, title: '1 hour gaming', cost: 30 }
       ]
     };
 
@@ -530,6 +595,7 @@
       window.location.reload();
     }
 
+    // AUTOMATIC DAILIES RESET AT MIDNIGHT
     function checkDailyReset() {
       if (!userData) return;
       const today = new Date().toDateString();
@@ -564,26 +630,34 @@
       render();
     }
 
-    // TUTORIAL SYSTEM
+    // HELP & TUTORIAL SYSTEM WITH TABS
     let tutStep = 0;
     const tutSteps = [
-      { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily tasks, level up, earn gold, and reward yourself." },
-      { title: "📅 Daily Habits (Dailies)", body: "In the 'Dailies' tab you can set routines like brushing teeth, showering, or waking up early. They reset automatically every day! Doing them daily gives steady XP and Gold to start your day right." },
-      { title: "⚔️ Quests", body: "Use Quests for one-time tasks or bigger challenges. Set timers, track counts, and add deadlines for higher rewards!" },
-      { title: "🎯 Goals", body: "Set big, long-term achievements (like passing an exam or losing weight). These give massive XP and Gold bonuses!" },
-      { title: "🛒 The Shop", body: "Use your hard-earned Gold to buy real-life rewards you create (e.g., 1 hour of gaming, watching a movie, or a treat)." }
+      { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily habits, level up, earn gold, and reward yourself." },
+      { title: "📅 Daily Habits (Dailies)", body: "In the 'Dailies' tab, set up your daily habits (like brushing teeth or working out). When you complete a daily task, it disappears from the list! At midnight, it automatically reappears for the new day." },
+      { title: "⚔️ Quests & Deadlines", body: "Use Quests for one-time tasks. You can set a counter, use a timer, or add a specific deadline. Tasks with an early deadline automatically appear at the top!" },
+      { title: "🎯 Life Goals (Goals)", body: "Set long-term goals (like passing an exam or getting your driver's license). These grant huge XP and Gold bonuses!" },
+      { title: "🛒 The Shop", body: "Use your hard-earned Gold to buy custom rewards that you set up yourself (e.g., 1 hour of gaming or watching a movie)." }
     ];
 
     function startTutorial() {
       tutStep = 0;
+      switchHelpTab('tut');
       showTutStep();
       document.getElementById('tutorial-modal').style.display = 'flex';
+    }
+
+    function switchHelpTab(tab) {
+      document.getElementById('modal-tab-tut').classList.toggle('active', tab === 'tut');
+      document.getElementById('modal-tab-notif').classList.toggle('active', tab === 'notif');
+      document.getElementById('help-sec-tut').style.display = tab === 'tut' ? 'block' : 'none';
+      document.getElementById('help-sec-notif').style.display = tab === 'notif' ? 'block' : 'none';
     }
 
     function showTutStep() {
       document.getElementById('tut-title').innerText = tutSteps[tutStep].title;
       document.getElementById('tut-body').innerText = tutSteps[tutStep].body;
-      document.getElementById('tut-btn').innerText = tutStep === tutSteps.length - 1 ? "Let's Play! 🚀" : "Next ➡️";
+      document.getElementById('tut-btn').innerText = tutStep === tutSteps.length - 1 ? "Get Started! 🚀" : "Next ➡️";
     }
 
     function nextTutorialStep() {
@@ -609,7 +683,7 @@
       const targetInput = document.getElementById('quest-target');
       if (type === 'counter') {
         targetInput.style.display = 'block';
-        targetInput.placeholder = 'Target';
+        targetInput.placeholder = 'Amount';
         targetInput.value = 8;
       } else if (type === 'timer') {
         targetInput.style.display = 'block';
@@ -626,9 +700,11 @@
       return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
 
+    // MAIN RENDER FUNCTION
     function render() {
       if (!userData) return;
       checkDailyReset();
+      syncNotificationUI();
       
       const maxXp = userData.level * 100;
 
@@ -639,37 +715,44 @@
       document.getElementById('max-xp').innerText = maxXp;
       document.getElementById('xp-bar').style.width = `${Math.min((userData.xp / maxXp) * 100, 100)}%`;
 
-      // Render Dailies
+      // 1. RENDER DAILIES (ONLY UNCOMPLETED VISIBLE)
       const dailyList = document.getElementById('daily-list');
-      const dailies = userData.dailies || [];
-      dailyList.innerHTML = dailies.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No daily habits set.</p>' : '';
-      
-      dailies.forEach(d => {
-        const isDone = d.completedToday;
-        const actionBtn = isDone 
-          ? `<button class="btn-action" style="background:#2d2d35; color:var(--subtext); cursor:default;" disabled>✅ Completed</button>`
-          : `<button class="btn-action" style="background:var(--success); color:white;" onclick="completeDaily(${d.id})">✓ Complete</button>`;
+      const activeDailies = (userData.dailies || []).filter(d => !d.completedToday);
 
+      dailyList.innerHTML = activeDailies.length === 0 
+        ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">🎉 All Dailies for today are completed!</p>' 
+        : '';
+      
+      activeDailies.forEach(d => {
         dailyList.innerHTML += `
-          <div class="card daily-card ${isDone ? 'completed-card' : ''}">
+          <div class="card daily-card">
             <div class="card-info">
               <h4>${d.title}</h4>
               <p><span class="badge-xp">+${d.xp} XP</span> • <span class="badge-gold">+${d.gold} Gold</span></p>
             </div>
             <div class="actions">
-              ${actionBtn}
+              <button class="btn-action" style="background:var(--success); color:white;" onclick="completeDaily(${d.id})">✓ Complete</button>
               <button class="btn-delete" onclick="deleteDaily(${d.id})">🗑️</button>
             </div>
           </div>
         `;
       });
 
-      // Render Quests
+      // 2. RENDER QUESTS (CHRONOLOGICAL ORDER: EARLIEST DEADLINE AT TOP)
       const questList = document.getElementById('quest-list');
-      const quests = userData.quests || [];
-      questList.innerHTML = quests.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No active quests.</p>' : '';
+      const rawQuests = userData.quests || [];
       
-      quests.forEach(q => {
+      // Sort by date/time: Earliest deadline at top, no deadline at bottom
+      const sortedQuests = [...rawQuests].sort((a, b) => {
+        if (!a.dueDate && !b.dueDate) return 0;
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      });
+
+      questList.innerHTML = sortedQuests.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No active quests.</p>' : '';
+      
+      sortedQuests.forEach(q => {
         let actionButtons = '';
         let extraBadge = '';
         let dueBadge = '';
@@ -677,7 +760,7 @@
         if (q.dueDate) {
           const d = new Date(q.dueDate);
           const formattedDate = d.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
-          dueBadge = `<br><span class="badge-due">⏳ Due: ${formattedDate}</span>`;
+          dueBadge = `<br><span class="badge-due">⏳ Deadline: ${formattedDate}</span>`;
         }
 
         if (q.type === 'counter') {
@@ -692,7 +775,7 @@
           const playBtnText = q.isRunning ? '⏸️' : '▶️';
           actionButtons = `<button class="btn-timer" onclick="toggleTimer(${q.id})">${playBtnText}</button> <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>`;
         } else {
-          actionButtons = `<button class="btn-action" onclick="completeQuest(${q.id})">✓</button>`;
+          actionButtons = `<button class="btn-action" onclick="completeQuest(${q.id})">✓ Complete</button>`;
         }
 
         questList.innerHTML += `
@@ -709,10 +792,10 @@
         `;
       });
 
-      // Render Goals
+      // 3. RENDER GOALS
       const goalList = document.getElementById('goal-list');
       const goals = userData.goals || [];
-      goalList.innerHTML = goals.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No major goals set.</p>' : '';
+      goalList.innerHTML = goals.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No goals set.</p>' : '';
       goals.forEach(g => {
         goalList.innerHTML += `
           <div class="card goal-card">
@@ -728,10 +811,10 @@
         `;
       });
 
-      // Render Shop
+      // 4. RENDER SHOP
       const shopList = document.getElementById('shop-list');
       const shop = userData.shop || [];
-      shopList.innerHTML = shop.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No rewards in shop.</p>' : '';
+      shopList.innerHTML = shop.length === 0 ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">No rewards in the shop.</p>' : '';
       shop.forEach(s => {
         shopList.innerHTML += `
           <div class="card">
@@ -774,7 +857,7 @@
       save();
     }
 
-    // GENERAL ACTIONS
+    // QUESTS & GOALS ACTIONS
     function addQuest(e) {
       e.preventDefault();
       const title = document.getElementById('quest-title').value;
@@ -887,7 +970,7 @@
       if (!item) return;
       if (userData.gold >= item.cost) {
         userData.gold -= item.cost;
-        showToast(`Bought: ${item.title}! 🎁`);
+        showToast(`Purchased: ${item.title}! 🎁`);
         save();
       } else alert('Not enough gold!');
     }
@@ -901,7 +984,7 @@
       setTimeout(() => toast.style.display = 'none', 3000);
     }
 
-    // INTERVAL FOR TIMERS, DEADLINES & MIDNIGHT RESET CHECK
+    // INTERVAL FOR TIMERS, DEADLINES & AUTOMATIC MIDNIGHT RESET
     setInterval(() => {
       if (!userData) return;
       
@@ -919,7 +1002,7 @@
             if (timeLeft > 0 && timeLeft <= 15 * 60 * 1000 && !q.warned) {
               q.warned = true;
               hasChanges = true;
-              sendNotification('⏰ Deadline Nearing!', `You have less than 15 minutes left for: "${q.title}"!`);
+              sendNotification('⏰ Deadline approaching!', `Less than 15 minutes left for: "${q.title}"!`);
             }
 
             if (now >= dueTime) {
@@ -951,7 +1034,7 @@
     }, 1000);
   </script>
 
-  <!-- PWA SERVICE WORKER & UPDATE NOTIFICATION LOGIC -->
+  <!-- PWA SERVICE WORKER & UPDATE LOGIC -->
   <script>
     let newWorker;
 
