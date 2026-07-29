@@ -33,7 +33,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 40px; max-width: 500px; margin: 0 auto; }
+    body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 40px; max-width: 500px; margin: 0 auto; overflow-x: hidden; }
 
     /* AUTH / LOGIN SCREEN */
     #auth-screen { display: flex; flex-direction: column; justify-content: center; min-height: 80vh; }
@@ -83,11 +83,23 @@
     .section { display: none; }
     .section.active { display: block; }
 
-    /* Forms */
+    /* Forms & Responsiveness Fixes */
     .add-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid #2d2d35; }
-    .form-row { display: flex; gap: 8px; width: 100%; }
-    input, select { background: #121214; border: 1px solid #2d2d35; color: var(--text); padding: 10px; border-radius: 8px; outline: none; font-size: 0.9rem; }
-    input[type="text"], input[type="email"], input[type="password"] { flex: 1; }
+    .form-row { display: flex; gap: 8px; width: 100%; align-items: center; }
+    
+    input, select { 
+      background: #121214; 
+      border: 1px solid #2d2d35; 
+      color: var(--text); 
+      padding: 10px; 
+      border-radius: 8px; 
+      outline: none; 
+      font-size: 0.85rem; 
+      min-width: 0; 
+      box-sizing: border-box; 
+    }
+
+    input[type="text"], input[type="email"], input[type="password"] { flex: 1; min-width: 0; }
     
     input[type="datetime-local"], input[type="time"] { 
       color: #ffffff !important; 
@@ -95,9 +107,19 @@
       border: 1px solid #3f3f46 !important;
       color-scheme: dark;
       font-size: 0.85rem;
+      min-width: 0;
+      width: 100%;
     }
 
-    .btn-add { background: var(--success); color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    select {
+      min-width: 0;
+      max-width: 100%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .btn-add { background: var(--success); color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; flex-shrink: 0; }
 
     /* Item list */
     .list { display: flex; flex-direction: column; gap: 10px; }
@@ -210,11 +232,14 @@
           <input type="text" id="daily-title" placeholder="Daily habit (e.g., Brush teeth)..." required>
         </div>
         <div class="form-row">
-          <input type="time" id="daily-time" style="flex: 1; min-width: 110px;" title="Optional time reminder">
-          <select id="daily-xp" style="flex: 1;">
-            <option value="5">⚡ Small (+5 XP / +2 Gold)</option>
-            <option value="10" selected>🌱 Normal (+10 XP / +4 Gold)</option>
-            <option value="15">🔥 Important (+15 XP / +6 Gold)</option>
+          <div style="display: flex; align-items: center; gap: 4px; flex: 1; min-width: 100px;">
+            <span style="font-size: 0.8rem; color: var(--subtext); white-space: nowrap;">⏰ Time:</span>
+            <input type="time" id="daily-time" title="Optional time reminder">
+          </div>
+          <select id="daily-xp" style="flex: 1; min-width: 100px;">
+            <option value="5">⚡ Small (+5 XP)</option>
+            <option value="10" selected>🌱 Normal (+10 XP)</option>
+            <option value="15">🔥 Important (+15 XP)</option>
           </select>
           <button type="submit" class="btn-add">+</button>
         </div>
@@ -234,7 +259,7 @@
             <option value="counter">🔢 Counter / Count</option>
             <option value="timer">⏱️ Timer (minutes)</option>
           </select>
-          <input type="number" id="quest-target" placeholder="Amount" value="8" min="1" style="width: 80px; display: none;">
+          <input type="number" id="quest-target" placeholder="Amount" value="8" min="1" style="width: 70px; display: none;">
           <select id="quest-xp" style="width: 90px;">
             <option value="25">25 XP</option>
             <option value="50" selected>50 XP</option>
@@ -277,7 +302,7 @@
       <form class="add-form" onsubmit="addShopItem(event)">
         <div class="form-row">
           <input type="text" id="item-title" placeholder="Reward (e.g., 1 hour gaming)..." required>
-          <input type="number" id="item-cost" placeholder="Gold" style="width: 80px;" required>
+          <input type="number" id="item-cost" placeholder="Gold" style="width: 70px;" required>
           <button type="submit" class="btn-add">+</button>
         </div>
       </form>
@@ -300,20 +325,12 @@
       <div style="max-height: 320px; overflow-y: auto; margin-bottom: 16px; padding-right: 4px;">
         
         <div style="border-bottom: 1px solid #3f3f46; padding-bottom: 10px; margin-bottom: 12px;">
-          <h4 style="color: var(--accent-gold); font-size: 0.95rem;">🚀 Version 6.0 (Latest)</h4>
+          <h4 style="color: var(--accent-gold); font-size: 0.95rem;">🚀 Version 7.0 (Latest)</h4>
           <ul class="help-step-list" style="margin-left: 16px; margin-top: 6px;">
-            <li><strong>⏰ Daily Scheduled Times:</strong> Set a specific time for your daily habits!</li>
-            <li><strong>🔔 Scheduled Notifications:</strong> Receive automated push reminders right on time for your daily habits.</li>
-            <li><strong>⏳ Chronological Sorting:</strong> Dailies are now sorted from earliest to latest based on scheduled time.</li>
-            <li><strong>✨ In-App Patch Notes:</strong> View update details and changelogs directly inside the app anytime!</li>
-          </ul>
-        </div>
-
-        <div style="border-bottom: 1px solid #3f3f46; padding-bottom: 10px; margin-bottom: 12px;">
-          <h4 style="color: var(--subtext); font-size: 0.95rem;">📦 Version 5.0</h4>
-          <ul class="help-step-list" style="margin-left: 16px; margin-top: 6px;">
-            <li><strong>⏱️ Task Timers & Counters:</strong> Interactive timers and progress counters for complex quests.</li>
-            <li><strong>☁️ Firebase Cloud Sync:</strong> Seamless real-time sync across all your mobile and desktop devices.</li>
+            <li><strong>📱 Layout Fixes:</strong> Perfected mobile layout so input forms never spill outside the screen.</li>
+            <li><strong>⏰ Daily Time Label:</strong> Added clear <code>⏰ Time:</code> indicator for daily habits.</li>
+            <li><strong>🔔 Scheduled Notifications:</strong> Receive automated push reminders right on time.</li>
+            <li><strong>⏳ Chronological Sorting:</strong> Dailies are sorted from earliest to latest based on scheduled time.</li>
           </ul>
         </div>
 
