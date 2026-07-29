@@ -1,4 +1,4 @@
-const CACHE_NAME = 'life-rpg-v8'; // ⚠️ VERSENUMMER OPGEHOOGD NAAR V8
+const CACHE_NAME = 'life-rpg-v8';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -6,7 +6,7 @@ const ASSETS_TO_CACHE = [
   './manifest.json'
 ];
 
-// 1. Installatie: skipWaiting om direct nieuwste versie te laden
+// 1. Install: skipWaiting to immediately load the newest version
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -16,14 +16,14 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. Activatie: Oude caches opruimen
+// 2. Activate: Clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
-            console.log('Oude cache verwijderd:', cache);
+            console.log('Old cache removed:', cache);
             return caches.delete(cache);
           }
         })
@@ -32,7 +32,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. Network-First strategie
+// 3. Network-First strategy
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
@@ -47,12 +47,12 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// 4. Push Notificaties
+// 4. Push Notifications
 self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {};
   const title = data.title || '🎮 Life RPG';
   const options = {
-    body: data.body || 'Je hebt taken die aandacht nodig hebben!',
+    body: data.body || 'You have tasks that need attention!',
     icon: 'https://cdn-icons-png.flaticon.com/512/3408/3408506.png',
     badge: 'https://cdn-icons-png.flaticon.com/512/3408/3408506.png',
     vibrate: [200, 100, 200]
@@ -60,7 +60,7 @@ self.addEventListener('push', (event) => {
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// 5. Luister naar skipWaiting signaal
+// 5. Listen for skipWaiting signal
 self.addEventListener('message', (event) => {
   if (event.data && event.data.action === 'skipWaiting') {
     self.skipWaiting();
