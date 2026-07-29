@@ -71,8 +71,8 @@
     .progress-bar { background: linear-gradient(90deg, #4f46e5, #818cf8); height: 100%; width: 0%; transition: width 0.3s ease; }
     .xp-text { font-size: 0.8rem; color: var(--subtext); text-align: right; }
 
-    .header-btns { display: flex; gap: 6px; }
-    .icon-btn { background: #2d2d35; border: none; color: var(--text); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 4px; }
+    .header-btns { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+    .icon-btn { background: #2d2d35; border: none; color: var(--text); padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 3px; }
     .icon-btn.active-notif { background: #059669; color: white; }
 
     /* Tabs Navigation */
@@ -89,7 +89,7 @@
     input, select { background: #121214; border: 1px solid #2d2d35; color: var(--text); padding: 10px; border-radius: 8px; outline: none; font-size: 0.9rem; }
     input[type="text"], input[type="email"], input[type="password"] { flex: 1; }
     
-    input[type="datetime-local"] { 
+    input[type="datetime-local"], input[type="time"] { 
       color: #ffffff !important; 
       background-color: #2d2d35 !important;
       border: 1px solid #3f3f46 !important;
@@ -174,7 +174,8 @@
       <div class="top-bar">
         <span>Hero: <strong id="user-display" style="color: var(--text);">Player</strong> <span id="network-status" class="status-tag">🟢 Online</span></span>
         <div class="header-btns">
-          <button class="icon-btn" id="notif-toggle-btn" onclick="toggleNotificationSetting()">🔔 Notifications</button>
+          <button class="icon-btn" onclick="openUpdatesModal()">✨ Updates</button>
+          <button class="icon-btn" id="notif-toggle-btn" onclick="toggleNotificationSetting()">🔔 Notifs</button>
           <button class="icon-btn" onclick="startTutorial()">❓ Help</button>
           <button class="icon-btn" onclick="logout()">🚪 Log Out</button>
         </div>
@@ -209,6 +210,7 @@
           <input type="text" id="daily-title" placeholder="Daily habit (e.g., Brush teeth)..." required>
         </div>
         <div class="form-row">
+          <input type="time" id="daily-time" style="flex: 1; min-width: 110px;" title="Optional time reminder">
           <select id="daily-xp" style="flex: 1;">
             <option value="5">⚡ Small (+5 XP / +2 Gold)</option>
             <option value="10" selected>🌱 Normal (+10 XP / +4 Gold)</option>
@@ -285,10 +287,41 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- UPDATE TOAST -->
+  <!-- UPDATE TOAST FOR SERVICE WORKER -->
   <div id="update-toast" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#6366f1; color:white; padding:12px 20px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.6); z-index:9999; text-align:center; width: 90%; max-width: 400px; justify-content: space-between; align-items: center;">
     <span style="font-size:0.85rem; font-weight:bold;">🚀 New update available!</span>
     <button onclick="updateApp()" style="background:white; color:#6366f1; border:none; padding:6px 12px; border-radius:6px; font-weight:bold; cursor:pointer; margin-left: 10px;">Update Now</button>
+  </div>
+
+  <!-- UPDATES / WHAT'S NEW MODAL -->
+  <div class="modal-overlay" id="updates-modal">
+    <div class="modal-content">
+      <h3>✨ What's New in Life RPG</h3>
+      <div style="max-height: 320px; overflow-y: auto; margin-bottom: 16px; padding-right: 4px;">
+        
+        <div style="border-bottom: 1px solid #3f3f46; padding-bottom: 10px; margin-bottom: 12px;">
+          <h4 style="color: var(--accent-gold); font-size: 0.95rem;">🚀 Version 6.0 (Latest)</h4>
+          <ul class="help-step-list" style="margin-left: 16px; margin-top: 6px;">
+            <li><strong>⏰ Daily Scheduled Times:</strong> Set a specific time for your daily habits!</li>
+            <li><strong>🔔 Scheduled Notifications:</strong> Receive automated push reminders right on time for your daily habits.</li>
+            <li><strong>⏳ Chronological Sorting:</strong> Dailies are now sorted from earliest to latest based on scheduled time.</li>
+            <li><strong>✨ In-App Patch Notes:</strong> View update details and changelogs directly inside the app anytime!</li>
+          </ul>
+        </div>
+
+        <div style="border-bottom: 1px solid #3f3f46; padding-bottom: 10px; margin-bottom: 12px;">
+          <h4 style="color: var(--subtext); font-size: 0.95rem;">📦 Version 5.0</h4>
+          <ul class="help-step-list" style="margin-left: 16px; margin-top: 6px;">
+            <li><strong>⏱️ Task Timers & Counters:</strong> Interactive timers and progress counters for complex quests.</li>
+            <li><strong>☁️ Firebase Cloud Sync:</strong> Seamless real-time sync across all your mobile and desktop devices.</li>
+          </ul>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn" onclick="document.getElementById('updates-modal').style.display='none';">Got it! 👍</button>
+      </div>
+    </div>
   </div>
 
   <!-- HELP & TUTORIAL MODAL WITH TABS -->
@@ -314,7 +347,7 @@
         <p>Follow these steps to receive notifications for reminders and deadlines:</p>
         
         <ol class="help-step-list">
-          <li><strong>Step 1: In-App Button</strong><br>Click the <code>🔔 Notifications</code> button at the top right of the app. Tap <em>"Allow"</em> when prompted by your browser/phone.</li>
+          <li><strong>Step 1: In-App Button</strong><br>Click the <code>🔔 Notifs</code> button at the top right of the app. Tap <em>"Allow"</em> when prompted by your browser/phone.</li>
           <li><strong>📱 For iPhone (iOS):</strong><br>Notifications on iOS only work if you add the app to your Home Screen! In Safari, tap the <em>'Share'</em> icon at the bottom ➔ Choose <em>'Add to Home Screen'</em>. Launch the app from your home screen and enable notifications.</li>
           <li><strong>🤖 For Android / Chrome:</strong><br>If you accidentally tapped 'Block': Tap the lock/settings icon next to the URL bar ➔ Select <em>Site Settings</em> ➔ Change <em>Notifications</em> to <em>Allow</em>.</li>
         </ol>
@@ -398,17 +431,20 @@
       }
     }
 
-    // FIX: PERMANENT NOTIFICATION STATUS & ACCURATE STORAGE
+    function openUpdatesModal() {
+      document.getElementById('updates-modal').style.display = 'flex';
+    }
+
     function syncNotificationUI() {
       const btn = document.getElementById('notif-toggle-btn');
       const isGranted = 'Notification' in window && Notification.permission === 'granted';
       const isSavedOn = userData && userData.notificationsEnabled === true;
 
       if (isGranted && isSavedOn) {
-        btn.innerHTML = '🔔 Notifications: ON';
+        btn.innerHTML = '🔔 Notifs: ON';
         btn.classList.add('active-notif');
       } else {
-        btn.innerHTML = '🔔 Notifications: OFF';
+        btn.innerHTML = '🔔 Notifs: OFF';
         btn.classList.remove('active-notif');
       }
     }
@@ -490,9 +526,9 @@
       hasSeenTutorial: false,
       lastResetDate: new Date().toDateString(),
       dailies: [
-        { id: 101, title: 'Brush teeth 🪥', xp: 10, gold: 4, completedToday: false },
-        { id: 102, title: 'Take a shower 🚿', xp: 10, gold: 4, completedToday: false },
-        { id: 103, title: 'Wake up early ⏰', xp: 15, gold: 6, completedToday: false }
+        { id: 101, title: 'Wake up early ⏰', time: '07:00', xp: 15, gold: 6, completedToday: false, notifiedToday: false },
+        { id: 102, title: 'Brush teeth 🪥', time: '08:00', xp: 10, gold: 4, completedToday: false, notifiedToday: false },
+        { id: 103, title: 'Take a shower 🚿', time: '08:30', xp: 10, gold: 4, completedToday: false, notifiedToday: false }
       ],
       quests: [
         { id: 1, title: 'Drink 8 glasses of water', type: 'counter', current: 0, target: 8, xp: 50, gold: 20 },
@@ -602,7 +638,10 @@
       if (userData.lastResetDate !== today) {
         userData.lastResetDate = today;
         if (userData.dailies) {
-          userData.dailies.forEach(d => d.completedToday = false);
+          userData.dailies.forEach(d => {
+            d.completedToday = false;
+            d.notifiedToday = false;
+          });
         }
         saveLocally();
       }
@@ -634,7 +673,7 @@
     let tutStep = 0;
     const tutSteps = [
       { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily habits, level up, earn gold, and reward yourself." },
-      { title: "📅 Daily Habits (Dailies)", body: "In the 'Dailies' tab, set up your daily habits (like brushing teeth or working out). When you complete a daily task, it disappears from the list! At midnight, it automatically reappears for the new day." },
+      { title: "📅 Daily Habits (Dailies)", body: "In the 'Dailies' tab, set up your daily habits. You can give them a scheduled time! Tasks are automatically sorted chronologically from morning to evening." },
       { title: "⚔️ Quests & Deadlines", body: "Use Quests for one-time tasks. You can set a counter, use a timer, or add a specific deadline. Tasks with an early deadline automatically appear at the top!" },
       { title: "🎯 Life Goals (Goals)", body: "Set long-term goals (like passing an exam or getting your driver's license). These grant huge XP and Gold bonuses!" },
       { title: "🛒 The Shop", body: "Use your hard-earned Gold to buy custom rewards that you set up yourself (e.g., 1 hour of gaming or watching a movie)." }
@@ -715,20 +754,29 @@
       document.getElementById('max-xp').innerText = maxXp;
       document.getElementById('xp-bar').style.width = `${Math.min((userData.xp / maxXp) * 100, 100)}%`;
 
-      // 1. RENDER DAILIES (ONLY UNCOMPLETED VISIBLE)
+      // 1. RENDER DAILIES (SORTED CHRONOLOGICALLY BY TIME)
       const dailyList = document.getElementById('daily-list');
       const activeDailies = (userData.dailies || []).filter(d => !d.completedToday);
+
+      // Sort by scheduled time (earliest first; tasks without time at bottom)
+      activeDailies.sort((a, b) => {
+        if (!a.time && !b.time) return 0;
+        if (!a.time) return 1;
+        if (!b.time) return -1;
+        return a.time.localeCompare(b.time);
+      });
 
       dailyList.innerHTML = activeDailies.length === 0 
         ? '<p style="color:var(--subtext); text-align:center; padding: 20px 0;">🎉 All Dailies for today are completed!</p>' 
         : '';
       
       activeDailies.forEach(d => {
+        const timeBadge = d.time ? ` • <span class="badge-due">⏰ ${d.time}</span>` : '';
         dailyList.innerHTML += `
           <div class="card daily-card">
             <div class="card-info">
               <h4>${d.title}</h4>
-              <p><span class="badge-xp">+${d.xp} XP</span> • <span class="badge-gold">+${d.gold} Gold</span></p>
+              <p><span class="badge-xp">+${d.xp} XP</span> • <span class="badge-gold">+${d.gold} Gold</span>${timeBadge}</p>
             </div>
             <div class="actions">
               <button class="btn-action" style="background:var(--success); color:white;" onclick="completeDaily(${d.id})">✓ Complete</button>
@@ -742,7 +790,6 @@
       const questList = document.getElementById('quest-list');
       const rawQuests = userData.quests || [];
       
-      // Sort by date/time: Earliest deadline at top, no deadline at bottom
       const sortedQuests = [...rawQuests].sort((a, b) => {
         if (!a.dueDate && !b.dueDate) return 0;
         if (!a.dueDate) return 1;
@@ -835,12 +882,23 @@
     function addDaily(e) {
       e.preventDefault();
       const title = document.getElementById('daily-title').value;
+      const timeVal = document.getElementById('daily-time').value || null;
       const xp = parseInt(document.getElementById('daily-xp').value);
       const gold = Math.max(1, Math.round(xp / 2.5));
 
       if (!userData.dailies) userData.dailies = [];
-      userData.dailies.push({ id: Date.now(), title, xp, gold, completedToday: false });
+      userData.dailies.push({ 
+        id: Date.now(), 
+        title, 
+        time: timeVal, 
+        xp, 
+        gold, 
+        completedToday: false, 
+        notifiedToday: false 
+      });
+
       document.getElementById('daily-title').value = '';
+      document.getElementById('daily-time').value = '';
       save();
     }
 
@@ -984,15 +1042,32 @@
       setTimeout(() => toast.style.display = 'none', 3000);
     }
 
-    // INTERVAL FOR TIMERS, DEADLINES & AUTOMATIC MIDNIGHT RESET
+    // INTERVAL FOR TIMERS, DEADLINES, SCHEDULED DAILIES & AUTOMATIC MIDNIGHT RESET
     setInterval(() => {
       if (!userData) return;
       
       checkDailyReset();
 
-      const now = new Date().getTime();
+      const nowObj = new Date();
+      const now = nowObj.getTime();
+      const currentHours = nowObj.getHours().toString().padStart(2, '0');
+      const currentMinutes = nowObj.getMinutes().toString().padStart(2, '0');
+      const currentTimeStr = `${currentHours}:${currentMinutes}`;
+
       let hasChanges = false;
 
+      // 1. CHECK DAILY TIME REMINDERS
+      if (userData.dailies) {
+        userData.dailies.forEach(d => {
+          if (d.time && !d.completedToday && !d.notifiedToday && d.time === currentTimeStr) {
+            d.notifiedToday = true;
+            hasChanges = true;
+            sendNotification('📅 Scheduled Daily Habit', `Time to complete: "${d.title}"!`);
+          }
+        });
+      }
+
+      // 2. CHECK QUEST DEADLINES & TIMERS
       if (userData.quests) {
         userData.quests = userData.quests.filter(q => {
           if (q.dueDate) {
