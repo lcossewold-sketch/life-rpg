@@ -1,4 +1,4 @@
-const CACHE_NAME = 'life-rpg-v4'; // ⚠️ INCREMENT THIS NUMBER WITH EVERY UPDATE (e.g. v4, v5)!
+const CACHE_NAME = 'life-rpg-v5'; // ⚠️ BUMP THIS NUMBER ON EVERY UPDATE (v5, v6, etc.)
 
 const ASSETS_TO_CACHE = [
   './',
@@ -6,7 +6,7 @@ const ASSETS_TO_CACHE = [
   './manifest.json'
 ];
 
-// 1. Installation: Force the new worker immediately
+// 1. Installation: Force immediate installation of the new service worker
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -16,14 +16,14 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// 2. Activation: Delete all old caches immediately
+// 2. Activation: Clean up old caches immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
           if (cache !== CACHE_NAME) {
-            console.log('Old cache cleared:', cache);
+            console.log('Old cache removed:', cache);
             return caches.delete(cache);
           }
         })
@@ -32,7 +32,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. Network-First Strategy: Always try fetching the latest version first
+// 3. Network-First strategy: Always fetch the latest version from the network
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
@@ -47,7 +47,20 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// 4. Listen for signal to switch over directly
+// 4. Listen for push messages (for background notifications)
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || '🎮 Life RPG';
+  const options = {
+    body: data.body || 'You have tasks that need attention!',
+    icon: 'https://cdn-icons-png.flaticon.com/512/3408/3408506.png',
+    badge: 'https://cdn-icons-png.flaticon.com/512/3408/3408506.png',
+    vibrate: [200, 100, 200]
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// 5. Switch immediately on signal
 self.addEventListener('message', (event) => {
   if (event.data && event.data.action === 'skipWaiting') {
     self.skipWaiting();
