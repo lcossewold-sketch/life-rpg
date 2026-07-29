@@ -1,4 +1,4 @@
-const CACHE_NAME = 'life-rpg-v6'; // ⚠️ BUMP THIS NUMBER ON EVERY UPDATE (v6, v7, etc.)
+const CACHE_NAME = 'life-rpg-v7'; // ⚠️ BUMP THIS NUMBER ON EVERY UPDATE (v7)
 
 const ASSETS_TO_CACHE = [
   './',
