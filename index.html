@@ -55,25 +55,12 @@
 
     /* LOADING / SPLASH SCREEN */
     #loading-screen { 
-      display: flex; 
-      flex-direction: column; 
-      justify-content: center; 
-      align-items: center; 
-      min-height: 85vh; 
-      text-align: center; 
+      display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 85vh; text-align: center; 
     }
     .loading-icon-container {
-      background: linear-gradient(135deg, var(--accent), var(--accent-purple));
-      width: 76px;
-      height: 76px;
-      border-radius: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.2rem;
-      margin-bottom: 20px;
-      box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
-      animation: pulseGlow 2s infinite ease-in-out;
+      background: linear-gradient(135deg, var(--accent), var(--accent-purple)); width: 76px; height: 76px;
+      border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem;
+      margin-bottom: 20px; box-shadow: 0 0 30px rgba(99, 102, 241, 0.5); animation: pulseGlow 2s infinite ease-in-out;
     }
     @keyframes pulseGlow {
       0% { transform: scale(1); box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
@@ -81,21 +68,12 @@
       100% { transform: scale(1); box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
     }
     .loading-bar-wrapper {
-      width: 220px;
-      background: #0f172a;
-      border-radius: 12px;
-      height: 10px;
-      overflow: hidden;
-      border: 1px solid var(--card-border);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-      margin-top: 16px;
+      width: 220px; background: #0f172a; border-radius: 12px; height: 10px; overflow: hidden;
+      border: 1px solid var(--card-border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); margin-top: 16px;
     }
     .loading-bar-fill {
-      background: linear-gradient(90deg, var(--accent), var(--accent-purple));
-      height: 100%;
-      width: 30%;
-      border-radius: 12px;
-      animation: loadingSlide 1.4s infinite ease-in-out;
+      background: linear-gradient(90deg, var(--accent), var(--accent-purple)); height: 100%; width: 30%;
+      border-radius: 12px; animation: loadingSlide 1.4s infinite ease-in-out;
     }
     @keyframes loadingSlide {
       0% { transform: translateX(-100%); width: 40%; }
@@ -106,12 +84,8 @@
     /* AUTH / LOGIN SCREEN */
     #auth-screen { display: none; flex-direction: column; justify-content: center; min-height: 85vh; }
     .auth-card { 
-      background: var(--card-bg); 
-      padding: 28px 24px; 
-      border-radius: 20px; 
-      border: 1px solid var(--card-border); 
-      box-shadow: var(--shadow-soft);
-      text-align: left; 
+      background: var(--card-bg); padding: 28px 24px; border-radius: 20px; 
+      border: 1px solid var(--card-border); box-shadow: var(--shadow-soft); text-align: left; 
     }
     .auth-card h2 { margin-bottom: 6px; color: var(--text-main); text-align: center; font-size: 1.5rem; letter-spacing: -0.5px; }
     .auth-card p.subtitle { color: var(--text-muted); margin-bottom: 24px; font-size: 0.88rem; text-align: center; }
@@ -124,26 +98,14 @@
     .toggle-eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; }
 
     .auth-btn { 
-      width: 100%; 
-      background: linear-gradient(135deg, var(--accent), var(--accent-purple)); 
-      color: white; 
-      border: none; 
-      padding: 13px; 
-      border-radius: 12px; 
-      font-weight: 700; 
-      cursor: pointer; 
-      font-size: 1rem; 
-      margin-top: 20px; 
-      margin-bottom: 12px; 
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
-      transition: all 0.2s ease;
+      width: 100%; background: linear-gradient(135deg, var(--accent), var(--accent-purple)); color: white; 
+      border: none; padding: 13px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1rem; 
+      margin-top: 20px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4); transition: all 0.2s ease;
     }
     .auth-btn:active { transform: scale(0.97); }
 
     .auth-links { display: flex; flex-direction: column; gap: 10px; text-align: center; margin-top: 10px; }
-    .auth-toggle, .auth-forgot { 
-      background: none; border: none; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; text-decoration: none; font-family: inherit; transition: color 0.2s;
-    }
+    .auth-toggle, .auth-forgot { background: none; border: none; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; text-decoration: none; font-family: inherit; transition: color 0.2s; }
     .auth-toggle:hover { color: var(--text-main); }
     .auth-forgot { color: var(--accent-gold); }
 
@@ -152,177 +114,77 @@
 
     /* HEADER */
     .header { 
-      background: var(--card-bg); 
-      padding: 18px; 
-      border-radius: 20px; 
-      margin-bottom: 18px; 
-      border: 1px solid var(--card-border); 
-      box-shadow: var(--shadow-soft);
-      position: relative; 
+      background: var(--card-bg); padding: 18px; border-radius: 20px; margin-bottom: 18px; 
+      border: 1px solid var(--card-border); box-shadow: var(--shadow-soft); position: relative; 
     }
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 0.85rem; color: var(--text-muted); }
     .status-tag { font-size: 0.72rem; padding: 3px 8px; border-radius: 20px; background: rgba(255, 255, 255, 0.06); font-weight: 600; margin-left: 6px; }
     
     .profile { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .level-badge { 
-      background: linear-gradient(135deg, var(--accent), var(--accent-purple)); 
-      color: white; 
-      padding: 5px 14px; 
-      border-radius: 20px; 
-      font-weight: 800; 
-      font-size: 1.05rem; 
-      display: inline-block; 
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      background: linear-gradient(135deg, var(--accent), var(--accent-purple)); color: white; padding: 5px 14px; 
+      border-radius: 20px; font-weight: 800; font-size: 1.05rem; display: inline-block; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
     .user-title { font-size: 0.82rem; color: var(--accent-gold); font-weight: 700; margin-top: 4px; letter-spacing: 0.3px; }
     .currency { color: var(--accent-gold); font-weight: 800; font-size: 1.15rem; display: flex; align-items: center; gap: 4px; }
 
-    .progress-container { 
-      background: #0f172a; 
-      border-radius: 12px; 
-      height: 14px; 
-      width: 100%; 
-      overflow: hidden; 
-      margin-bottom: 6px; 
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    .progress-bar { 
-      background: linear-gradient(90deg, #6366f1, #a855f7); 
-      height: 100%; 
-      width: 0%; 
-      border-radius: 12px;
-      transition: width 0.4s ease; 
-      box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
-    }
+    .progress-container { background: #0f172a; border-radius: 12px; height: 14px; width: 100%; overflow: hidden; margin-bottom: 6px; border: 1px solid rgba(255, 255, 255, 0.05); }
+    .progress-bar { background: linear-gradient(90deg, #6366f1, #a855f7); height: 100%; width: 0%; border-radius: 12px; transition: width 0.4s ease; box-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
     .xp-text { font-size: 0.78rem; color: var(--text-muted); text-align: right; font-weight: 600; }
 
     .header-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
     .icon-btn { 
-      background: rgba(255, 255, 255, 0.06); 
-      border: 1px solid rgba(255, 255, 255, 0.08); 
-      color: var(--text-main); 
-      padding: 6px 10px; 
-      border-radius: 10px; 
-      cursor: pointer; 
-      font-size: 0.75rem; 
-      font-weight: 600; 
-      display: flex; 
-      align-items: center; 
-      gap: 4px; 
-      transition: all 0.2s;
+      background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-main); 
+      padding: 6px 10px; border-radius: 10px; cursor: pointer; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 4px; transition: all 0.2s;
     }
     .icon-btn:active { transform: scale(0.97); }
     .icon-btn.active-notif { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #34d399; }
 
     /* Tabs Navigation */
-    .tabs { 
-      display: flex; 
-      gap: 6px; 
-      margin-bottom: 18px; 
-      background: rgba(21, 28, 44, 0.6); 
-      padding: 4px; 
-      border-radius: 14px; 
-      border: 1px solid var(--card-border);
-    }
-    .tab-btn { 
-      flex: 1; 
-      padding: 10px 4px; 
-      border: none; 
-      background: transparent; 
-      color: var(--text-muted); 
-      border-radius: 10px; 
-      font-weight: 700; 
-      cursor: pointer; 
-      font-size: 0.82rem; 
-      text-align: center; 
-      transition: all 0.2s ease;
-    }
-    .tab-btn.active { 
-      background: var(--accent); 
-      color: white; 
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
-    }
+    .tabs { display: flex; gap: 6px; margin-bottom: 18px; background: rgba(21, 28, 44, 0.6); padding: 4px; border-radius: 14px; border: 1px solid var(--card-border); }
+    .tab-btn { flex: 1; padding: 10px 4px; border: none; background: transparent; color: var(--text-muted); border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.82rem; text-align: center; transition: all 0.2s ease; }
+    .tab-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35); }
 
     .section { display: none; }
     .section.active { display: block; }
 
     /* Forms & Inputs */
-    .add-form { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 10px; 
-      margin-bottom: 18px; 
-      background: var(--card-bg); 
-      padding: 14px; 
-      border-radius: 16px; 
-      border: 1px solid var(--card-border); 
-      box-shadow: var(--shadow-soft);
-    }
+    .add-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; background: var(--card-bg); padding: 14px; border-radius: 16px; border: 1px solid var(--card-border); box-shadow: var(--shadow-soft); }
     .form-row { display: flex; gap: 8px; width: 100%; align-items: center; }
     
     input, select { 
-      background: var(--input-bg); 
-      border: 1px solid var(--card-border); 
-      color: var(--text-main); 
-      padding: 10px 12px; 
-      border-radius: 10px; 
-      outline: none; 
-      font-size: 0.85rem; 
-      min-width: 0; 
-      box-sizing: border-box; 
-      transition: border-color 0.2s;
+      background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 10px 12px; 
+      border-radius: 10px; outline: none; font-size: 0.85rem; min-width: 0; box-sizing: border-box; transition: border-color 0.2s;
     }
     input:focus, select:focus { border-color: var(--accent); }
 
     input[type="text"], input[type="email"], input[type="password"] { flex: 1; min-width: 0; }
     
     input[type="datetime-local"], input[type="time"] { 
-      color: var(--text-main) !important; 
-      background-color: var(--input-bg) !important;
-      border: 1px solid var(--card-border) !important;
-      color-scheme: dark;
-      font-size: 0.85rem;
-      min-width: 0;
-      width: 100%;
+      color: var(--text-main) !important; background-color: var(--input-bg) !important; border: 1px solid var(--card-border) !important; color-scheme: dark; font-size: 0.85rem; min-width: 0; width: 100%;
     }
 
-    select {
-      min-width: 0;
-      max-width: 100%;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-    }
+    select { min-width: 0; max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 
     .btn-add { 
-      background: var(--success); 
-      color: white; 
-      border: none; 
-      padding: 10px 16px; 
-      border-radius: 10px; 
-      font-weight: 800; 
-      font-size: 1.1rem;
-      cursor: pointer; 
-      flex-shrink: 0; 
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-      transition: transform 0.15s ease;
+      background: var(--success); color: white; border: none; padding: 10px 16px; border-radius: 10px; font-weight: 800; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); transition: transform 0.15s ease;
     }
     .btn-add:active { transform: scale(0.97); }
+
+    /* Day Selector for Dailies */
+    .days-selector { display: flex; gap: 4px; justify-content: space-between; margin-top: 4px; }
+    .day-btn-input { display: none; }
+    .day-btn-label {
+      flex: 1; text-align: center; padding: 6px 0; border-radius: 8px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-muted); cursor: pointer; font-size: 0.75rem; font-weight: 700; transition: all 0.2s;
+    }
+    .day-btn-input:checked + .day-btn-label { background: var(--accent); color: white; border-color: var(--accent); }
 
     /* Item Cards */
     .list { display: flex; flex-direction: column; gap: 10px; }
     
-    .card { 
-      background: var(--card-bg); 
-      border: 1px solid var(--card-border); 
-      padding: 14px 16px; 
-      border-radius: 16px; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      box-shadow: var(--shadow-soft);
-      transition: transform 0.15s ease;
-    }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 14px 16px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-soft); transition: transform 0.15s ease; }
     .card.goal-card { border-left: 4px solid var(--goal-accent); }
     .card.daily-card { border-left: 4px solid var(--daily-accent); }
     
@@ -336,75 +198,21 @@
     
     .actions { display: flex; gap: 6px; align-items: center; }
     
-    .btn-action { 
-      background: rgba(255, 255, 255, 0.08); 
-      border: 1px solid rgba(255, 255, 255, 0.1); 
-      color: var(--text-main); 
-      padding: 8px 12px; 
-      border-radius: 10px; 
-      cursor: pointer; 
-      font-weight: 700; 
-      font-size: 0.82rem; 
-      transition: all 0.2s ease;
-    }
+    .btn-action { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-main); padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 0.82rem; transition: all 0.2s ease; }
     .btn-action:active { transform: scale(0.97); }
     
     .btn-count { background: #3b82f6; color: white; border: none; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
     .btn-minus { background: rgba(255, 255, 255, 0.1); color: white; border: none; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
     .btn-timer { background: var(--accent-purple); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; }
     
-    .btn-delete { 
-      background: rgba(239, 68, 68, 0.12); 
-      border: 1px solid rgba(239, 68, 68, 0.2); 
-      color: #ef4444; 
-      padding: 8px; 
-      border-radius: 10px; 
-      cursor: pointer; 
-      font-weight: 700; 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    .btn-delete { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; padding: 8px; border-radius: 10px; cursor: pointer; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 
     /* Toast Notification */
-    .toast { 
-      position: fixed; 
-      bottom: 24px; 
-      left: 50%; 
-      transform: translateX(-50%); 
-      background: linear-gradient(135deg, var(--success), #059669); 
-      color: white; 
-      padding: 12px 24px; 
-      border-radius: 30px; 
-      font-weight: 700; 
-      font-size: 0.9rem;
-      display: none; 
-      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); 
-      z-index: 100; 
-      text-align: center; 
-    }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--success), #059669); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 700; font-size: 0.9rem; display: none; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); z-index: 100; text-align: center; }
 
     /* MODALS */
-    .modal-overlay { 
-      position: fixed; top:0; left:0; right:0; bottom:0; 
-      background: rgba(0,0,0,0.8); 
-      backdrop-filter: blur(4px);
-      display: none; 
-      justify-content: center; 
-      align-items: center; 
-      padding: 20px; 
-      z-index: 200; 
-    }
-    .modal-content { 
-      background: var(--card-bg); 
-      border: 1px solid var(--card-border); 
-      padding: 24px; 
-      border-radius: 20px; 
-      max-width: 440px; 
-      width: 100%; 
-      text-align: left; 
-      box-shadow: var(--shadow-soft);
-    }
+    .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; padding: 20px; z-index: 200; }
+    .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); padding: 24px; border-radius: 20px; max-width: 440px; width: 100%; text-align: left; box-shadow: var(--shadow-soft); }
     .modal-content h3 { color: var(--text-main); margin-bottom: 12px; text-align: center; font-size: 1.25rem; }
     .modal-content p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 14px; }
     
@@ -416,17 +224,7 @@
     .help-step-list li { margin-bottom: 6px; }
 
     .modal-footer { display: flex; justify-content: center; margin-top: 18px; }
-    .modal-btn { 
-      background: linear-gradient(135deg, var(--accent), var(--accent-purple)); 
-      color: white; 
-      border: none; 
-      padding: 12px 20px; 
-      border-radius: 12px; 
-      font-weight: 700; 
-      cursor: pointer; 
-      width: 100%; 
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
-    }
+    .modal-btn { background: linear-gradient(135deg, var(--accent), var(--accent-purple)); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4); }
   </style>
 </head>
 <body>
@@ -509,15 +307,37 @@
           <input type="text" id="daily-title" placeholder="Daily habit..." required>
         </div>
         <div class="form-row">
+          <select id="daily-type" onchange="toggleDailyInputs()" style="flex: 1;">
+            <option value="simple">⚡ Instant Complete</option>
+            <option value="counter">🔢 Counter / Amount</option>
+            <option value="timer">⏱️ Timer (minutes)</option>
+          </select>
+          <input type="number" id="daily-target" placeholder="Amount" value="8" min="1" style="width: 70px; display: none;">
+          <select id="daily-xp" style="flex: 1;">
+            <option value="5">⚡ (+5 XP)</option>
+            <option value="10" selected>🌱 (+10 XP)</option>
+            <option value="15">🔥 (+15 XP)</option>
+          </select>
+        </div>
+        
+        <div style="margin-top: 4px;">
+          <label style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-bottom: 4px; font-weight: 600;">📅 Active Days:</label>
+          <div class="days-selector">
+            <input type="checkbox" id="d-mon" name="daily-days" class="day-btn-input" value="1" checked><label for="d-mon" class="day-btn-label">M</label>
+            <input type="checkbox" id="d-tue" name="daily-days" class="day-btn-input" value="2" checked><label for="d-tue" class="day-btn-label">T</label>
+            <input type="checkbox" id="d-wed" name="daily-days" class="day-btn-input" value="3" checked><label for="d-wed" class="day-btn-label">W</label>
+            <input type="checkbox" id="d-thu" name="daily-days" class="day-btn-input" value="4" checked><label for="d-thu" class="day-btn-label">T</label>
+            <input type="checkbox" id="d-fri" name="daily-days" class="day-btn-input" value="5" checked><label for="d-fri" class="day-btn-label">F</label>
+            <input type="checkbox" id="d-sat" name="daily-days" class="day-btn-input" value="6" checked><label for="d-sat" class="day-btn-label">S</label>
+            <input type="checkbox" id="d-sun" name="daily-days" class="day-btn-input" value="0" checked><label for="d-sun" class="day-btn-label">S</label>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top: 4px;">
           <div style="display: flex; align-items: center; gap: 4px; flex: 1; min-width: 90px;">
             <span style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap;">⏰ Time:</span>
             <input type="time" id="daily-time" title="Optional reminder time">
           </div>
-          <select id="daily-xp" style="flex: 1; min-width: 100px;">
-            <option value="5">⚡ Small (+5 XP)</option>
-            <option value="10" selected>🌱 Normal (+10 XP)</option>
-            <option value="15">🔥 Important (+15 XP)</option>
-          </select>
           <button type="submit" class="btn-add">+</button>
         </div>
       </form>
@@ -602,10 +422,10 @@
       <div style="max-height: 320px; overflow-y: auto; margin-bottom: 16px; padding-right: 4px;">
         
         <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 10px; margin-bottom: 12px;">
-          <h4 style="color: var(--accent-gold); font-size: 0.95rem;">🚀 Version 8.1 (Sleek Startup & Design)</h4>
+          <h4 style="color: var(--accent-gold); font-size: 0.95rem;">🚀 Version 8.2 (Advanced Dailies)</h4>
           <ul class="help-step-list" style="margin-left: 16px; margin-top: 6px;">
-            <li><strong>✨ Animated Loading Screen:</strong> A gorgeous startup screen with a colored gradient background, glowing controller icon, and smooth loading bar.</li>
-            <li><strong>🎨 Midnight Slate Theme:</strong> Fully unified design with glassmorphism cards and smooth tactile buttons.</li>
+            <li><strong>📅 Specific Days:</strong> You can now select exactly which days of the week a Daily should appear (e.g., Workouts only on Tue/Thu).</li>
+            <li><strong>⏱️ Daily Timers & Counters:</strong> Set up a Daily to track a specific amount (e.g., drink 3 waters) or run a timer (e.g., 30 mins reading).</li>
           </ul>
         </div>
 
@@ -655,7 +475,6 @@
   <script>
     let isRegisterMode = false;
 
-    // TITLES & RANKS UP TO LEVEL 1000
     function getPlayerTitle(level) {
       if (level >= 1000) return '🌌👑 Ultimate Life RPG God';
       if (level >= 900)  return '👁️ Immortal Overlord';
@@ -701,70 +520,41 @@
     function sendPasswordReset() {
       const email = prompt('Enter your email address for a reset link:');
       if (email) {
-        if (typeof auth === 'undefined' || !auth) {
-          alert('Firebase is not initialized!');
-          return;
-        }
-        auth.sendPasswordResetEmail(email.trim())
-          .then(() => alert('Reset email sent! Check your inbox.'))
-          .catch(err => alert('Error: ' + err.message));
+        if (typeof auth === 'undefined' || !auth) { alert('Firebase is not initialized!'); return; }
+        auth.sendPasswordResetEmail(email.trim()).then(() => alert('Reset email sent! Check your inbox.')).catch(err => alert('Error: ' + err.message));
       }
     }
 
     function togglePasswordVisibility(inputId, btnId) {
       const input = document.getElementById(inputId);
       const btn = document.getElementById(btnId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.innerText = '🙈';
-      } else {
-        input.type = 'password';
-        btn.innerText = '👁️';
-      }
+      if (input.type === 'password') { input.type = 'text'; btn.innerText = '🙈'; } 
+      else { input.type = 'password'; btn.innerText = '👁️'; }
     }
 
-    function openUpdatesModal() {
-      document.getElementById('updates-modal').style.display = 'flex';
-    }
+    function openUpdatesModal() { document.getElementById('updates-modal').style.display = 'flex'; }
 
     function syncNotificationUI() {
       const btn = document.getElementById('notif-toggle-btn');
       const isGranted = 'Notification' in window && Notification.permission === 'granted';
       const isSavedOn = userData && userData.notificationsEnabled === true;
-
-      if (isGranted && isSavedOn) {
-        btn.innerHTML = '🔔 Notifs: ON';
-        btn.classList.add('active-notif');
-      } else {
-        btn.innerHTML = '🔔 Notifs: OFF';
-        btn.classList.remove('active-notif');
-      }
+      if (isGranted && isSavedOn) { btn.innerHTML = '🔔 Notifs: ON'; btn.classList.add('active-notif'); } 
+      else { btn.innerHTML = '🔔 Notifs: OFF'; btn.classList.remove('active-notif'); }
     }
 
     async function toggleNotificationSetting() {
-      if (!('Notification' in window)) {
-        alert('Your browser unfortunately does not support notifications.');
-        return;
-      }
-
+      if (!('Notification' in window)) { alert('Your browser unfortunately does not support notifications.'); return; }
       if (Notification.permission === 'granted') {
         userData.notificationsEnabled = !userData.notificationsEnabled;
-        save();
-        syncNotificationUI();
-        showToast(userData.notificationsEnabled ? '🔔 Notifications ON' : '🔕 Notifications OFF');
+        save(); syncNotificationUI(); showToast(userData.notificationsEnabled ? '🔔 Notifications ON' : '🔕 Notifications OFF');
       } else {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
-          userData.notificationsEnabled = true;
-          save();
-          syncNotificationUI();
-          showToast('🔔 Notifications enabled!');
-          sendNotification('🎮 Life RPG', 'Notifications successfully activated!');
+          userData.notificationsEnabled = true; save(); syncNotificationUI();
+          showToast('🔔 Notifications enabled!'); sendNotification('🎮 Life RPG', 'Notifications successfully activated!');
         } else {
           alert('Notifications are blocked in your browser. Check the Help screen to allow them.');
-          userData.notificationsEnabled = false;
-          save();
-          syncNotificationUI();
+          userData.notificationsEnabled = false; save(); syncNotificationUI();
         }
       }
     }
@@ -772,21 +562,11 @@
     function sendNotification(title, body) {
       if ('Notification' in window && Notification.permission === 'granted' && userData && userData.notificationsEnabled) {
         if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-          navigator.serviceWorker.ready.then(reg => {
-            reg.showNotification(title, {
-              body: body,
-              icon: 'https://cdn-icons-png.flaticon.com/512/3408/3408506.png',
-              vibrate: [200, 100, 200],
-              tag: 'life-rpg-notification'
-            });
-          });
-        } else {
-          new Notification(title, { body: body });
-        }
+          navigator.serviceWorker.ready.then(reg => { reg.showNotification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/3408/3408506.png', vibrate: [200, 100, 200], tag: 'life-rpg-notification' }); });
+        } else { new Notification(title, { body: body }); }
       }
     }
 
-    // FIREBASE INITIALIZATION
     const firebaseConfig = {
       apiKey: "AIzaSyD2FPl7SpLniSCgYNimRx8LGLmECIpVKck",
       authDomain: "life-rpg-eaa3e.firebaseapp.com",
@@ -803,42 +583,19 @@
       auth = firebase.auth();
       database = firebase.database();
       auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-    } catch (e) {
-      console.error("Firebase config error:", e);
-    }
+    } catch (e) { console.error("Firebase config error:", e); }
 
     let currentUser = null;
     let userData = null;
 
     let defaultUserData = {
-      xp: 0,
-      level: 1,
-      gold: 0,
-      notificationsEnabled: false,
-      hasSeenTutorial: false,
-      lastResetDate: new Date().toDateString(),
-      dailies: [
-        { id: 101, title: 'Wake up early ⏰', time: '07:00', xp: 15, gold: 6, completedToday: false, notifiedToday: false },
-        { id: 102, title: 'Brush teeth 🪥', time: '08:00', xp: 10, gold: 4, completedToday: false, notifiedToday: false },
-        { id: 103, title: 'Take a shower 🚿', time: '08:30', xp: 10, gold: 4, completedToday: false, notifiedToday: false }
-      ],
-      quests: [
-        { id: 1, title: 'Drink 8 glasses of water', type: 'counter', current: 0, target: 8, xp: 50, gold: 20 },
-        { id: 2, title: 'Clean room', type: 'simple', xp: 100, gold: 40 }
-      ],
-      goals: [
-        { id: 1, title: "Get driver's license 🚗", xp: 1000, gold: 400 }
-      ],
-      shop: [
-        { id: 1, title: '1 hour gaming', cost: 30 }
-      ]
+      xp: 0, level: 1, gold: 0, notificationsEnabled: false, hasSeenTutorial: false, lastResetDate: new Date().toDateString(),
+      dailies: [], quests: [], goals: [], shop: []
     };
 
     function loadLocalData() {
       const saved = localStorage.getItem('lifeRpgUserData');
-      if (saved) {
-        try { return JSON.parse(saved); } catch (e) { console.error('Error loading local data', e); }
-      }
+      if (saved) { try { return JSON.parse(saved); } catch (e) { console.error('Error loading local data', e); } }
       return null;
     }
 
@@ -847,8 +604,7 @@
       userData = cachedLocal;
       document.getElementById('loading-screen').style.display = 'none';
       document.getElementById('app-screen').style.display = 'block';
-      checkDailyReset();
-      render();
+      checkDailyReset(); render();
     }
 
     if (auth) {
@@ -875,65 +631,33 @@
                 userData = JSON.parse(JSON.stringify(defaultUserData));
                 await database.ref('users/' + user.uid).set(userData);
               }
-            } catch (err) {
-              console.log('Could not fetch cloud data, using local data.');
-            }
+            } catch (err) { console.log('Could not fetch cloud data, using local data.'); }
           }
 
           if (!userData) userData = JSON.parse(JSON.stringify(defaultUserData));
-          checkDailyReset();
-          saveLocally();
-          render();
-
-          if (!userData.hasSeenTutorial) {
-            startTutorial();
-          }
+          checkDailyReset(); saveLocally(); render();
+          if (!userData.hasSeenTutorial) startTutorial();
         } else {
-          if (!cachedLocal) {
-            currentUser = null;
-            userData = null;
-            document.getElementById('app-screen').style.display = 'none';
-            document.getElementById('auth-screen').style.display = 'flex';
-          }
+          if (!cachedLocal) { currentUser = null; userData = null; document.getElementById('app-screen').style.display = 'none'; document.getElementById('auth-screen').style.display = 'flex'; }
         }
       });
     } else {
-      // Fallback als auth niet laadt
-      setTimeout(() => {
-        document.getElementById('loading-screen').style.display = 'none';
-        if (!cachedLocal) {
-          document.getElementById('auth-screen').style.display = 'flex';
-        }
-      }, 1000);
+      setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; if (!cachedLocal) document.getElementById('auth-screen').style.display = 'flex'; }, 1000);
     }
 
     async function handleAuth(e) {
       e.preventDefault();
       if (!auth) { alert("Firebase is not initialized!"); return; }
-
       const email = document.getElementById('auth-email').value.trim();
       const pass = document.getElementById('auth-pass').value.trim();
-
       try {
-        if (isRegisterMode) {
-          await auth.createUserWithEmailAndPassword(email, pass);
-          showToast('Account created! Welcome!');
-        } else {
-          await auth.signInWithEmailAndPassword(email, pass);
-          showToast('Welcome back!');
-        }
-      } catch (err) {
-        alert('Authentication Error: ' + err.message);
-      }
+        if (isRegisterMode) { await auth.createUserWithEmailAndPassword(email, pass); showToast('Account created! Welcome!'); } 
+        else { await auth.signInWithEmailAndPassword(email, pass); showToast('Welcome back!'); }
+      } catch (err) { alert('Authentication Error: ' + err.message); }
     }
 
-    function logout() {
-      localStorage.removeItem('lifeRpgUserData');
-      if (auth) auth.signOut();
-      window.location.reload();
-    }
+    function logout() { localStorage.removeItem('lifeRpgUserData'); if (auth) auth.signOut(); window.location.reload(); }
 
-    // AUTOMATIC DAILIES RESET AT MIDNIGHT
     function checkDailyReset() {
       if (!userData) return;
       const today = new Date().toDateString();
@@ -943,35 +667,18 @@
           userData.dailies.forEach(d => {
             d.completedToday = false;
             d.notifiedToday = false;
+            if (d.type === 'counter') d.current = 0;
+            if (d.type === 'timer') { d.remainingSeconds = d.targetSeconds; d.isRunning = false; }
           });
         }
         saveLocally();
       }
     }
 
-    function saveLocally() {
-      if (userData) {
-        localStorage.setItem('lifeRpgUserData', JSON.stringify(userData));
-      }
-    }
+    function saveLocally() { if (userData) localStorage.setItem('lifeRpgUserData', JSON.stringify(userData)); }
+    async function syncDataWithCloud() { if (currentUser && userData && database && navigator.onLine) { try { await database.ref('users/' + currentUser.uid).set(userData); } catch (e) { console.error('Cloud sync failed:', e); } } }
+    function save() { saveLocally(); syncDataWithCloud(); render(); }
 
-    async function syncDataWithCloud() {
-      if (currentUser && userData && database && navigator.onLine) {
-        try {
-          await database.ref('users/' + currentUser.uid).set(userData);
-        } catch (e) {
-          console.error('Cloud sync failed:', e);
-        }
-      }
-    }
-
-    function save() {
-      saveLocally();
-      syncDataWithCloud();
-      render();
-    }
-
-    // TUTORIAL SYSTEM WITH TABS
     let tutStep = 0;
     const tutSteps = [
       { title: "Welcome Hero! 🛡️", body: "Turn your real life into an RPG! Complete daily habits, level up, earn gold, and reward yourself." },
@@ -981,74 +688,57 @@
       { title: "🛒 The Shop", body: "Use your hard-earned Gold to buy rewards you've set for yourself (e.g., 1 hour of gaming)." }
     ];
 
-    function startTutorial() {
-      tutStep = 0;
-      switchHelpTab('tut');
-      showTutStep();
-      document.getElementById('tutorial-modal').style.display = 'flex';
-    }
-
+    function startTutorial() { tutStep = 0; switchHelpTab('tut'); showTutStep(); document.getElementById('tutorial-modal').style.display = 'flex'; }
     function switchHelpTab(tab) {
       document.getElementById('modal-tab-tut').classList.toggle('active', tab === 'tut');
       document.getElementById('modal-tab-notif').classList.toggle('active', tab === 'notif');
       document.getElementById('help-sec-tut').style.display = tab === 'tut' ? 'block' : 'none';
       document.getElementById('help-sec-notif').style.display = tab === 'notif' ? 'block' : 'none';
     }
-
     function showTutStep() {
       document.getElementById('tut-title').innerText = tutSteps[tutStep].title;
       document.getElementById('tut-body').innerText = tutSteps[tutStep].body;
       document.getElementById('tut-btn').innerText = tutStep === tutSteps.length - 1 ? "Get Started! 🚀" : "Next ➡️";
     }
-
     function nextTutorialStep() {
       tutStep++;
-      if (tutStep < tutSteps.length) {
-        showTutStep();
-      } else {
-        document.getElementById('tutorial-modal').style.display = 'none';
-        userData.hasSeenTutorial = true;
-        save();
-      }
+      if (tutStep < tutSteps.length) showTutStep();
+      else { document.getElementById('tutorial-modal').style.display = 'none'; userData.hasSeenTutorial = true; save(); }
     }
 
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active'); document.getElementById(tabId).classList.add('active');
     }
 
     function toggleQuestInputs() {
       const type = document.getElementById('quest-type').value;
       const targetInput = document.getElementById('quest-target');
-      if (type === 'counter') {
-        targetInput.style.display = 'block';
-        targetInput.placeholder = 'Amount';
-        targetInput.value = 8;
-      } else if (type === 'timer') {
-        targetInput.style.display = 'block';
-        targetInput.placeholder = 'Minutes';
-        targetInput.value = 15;
-      } else {
-        targetInput.style.display = 'none';
-      }
+      if (type === 'counter') { targetInput.style.display = 'block'; targetInput.placeholder = 'Amount'; targetInput.value = 8; } 
+      else if (type === 'timer') { targetInput.style.display = 'block'; targetInput.placeholder = 'Minutes'; targetInput.value = 15; } 
+      else { targetInput.style.display = 'none'; }
+    }
+
+    function toggleDailyInputs() {
+      const type = document.getElementById('daily-type').value;
+      const targetInput = document.getElementById('daily-target');
+      if (type === 'counter') { targetInput.style.display = 'block'; targetInput.placeholder = 'Amount'; targetInput.value = 3; } 
+      else if (type === 'timer') { targetInput.style.display = 'block'; targetInput.placeholder = 'Minutes'; targetInput.value = 15; } 
+      else { targetInput.style.display = 'none'; }
     }
 
     function formatTime(seconds) {
-      const m = Math.floor(seconds / 60);
-      const s = seconds % 60;
+      const m = Math.floor(seconds / 60); const s = seconds % 60;
       return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
 
     // MAIN RENDER FUNCTION
     function render() {
       if (!userData) return;
-      checkDailyReset();
-      syncNotificationUI();
+      checkDailyReset(); syncNotificationUI();
       
       const maxXp = userData.level * 100;
-
       document.getElementById('level').innerText = `Lvl ${userData.level}`;
       document.getElementById('user-title').innerText = getPlayerTitle(userData.level);
       document.getElementById('gold').innerText = userData.gold;
@@ -1056,9 +746,15 @@
       document.getElementById('max-xp').innerText = maxXp;
       document.getElementById('xp-bar').style.width = `${Math.min((userData.xp / maxXp) * 100, 100)}%`;
 
-      // 1. DAILIES (SORTED CHRONOLOGICALLY)
+      // 1. DAILIES
       const dailyList = document.getElementById('daily-list');
-      const activeDailies = (userData.dailies || []).filter(d => !d.completedToday);
+      const todayDay = new Date().getDay(); // 0=Sun, 1=Mon, etc.
+
+      // Filter Dailies: not completed AND valid for today's day
+      const activeDailies = (userData.dailies || []).filter(d => {
+        const isToday = d.days ? d.days.includes(todayDay) : true;
+        return !d.completedToday && isToday;
+      });
 
       activeDailies.sort((a, b) => {
         if (!a.time && !b.time) return 0;
@@ -1068,30 +764,45 @@
       });
 
       dailyList.innerHTML = activeDailies.length === 0 
-        ? '<p style="color:var(--text-muted); text-align:center; padding: 24px 0; font-weight: 600;">🎉 All Dailies completed for today!</p>' 
-        : '';
+        ? '<p style="color:var(--text-muted); text-align:center; padding: 24px 0; font-weight: 600;">🎉 All Dailies completed for today!</p>' : '';
       
       activeDailies.forEach(d => {
         const timeBadge = d.time ? ` • <span class="badge-due">⏰ ${d.time}</span>` : '';
+        let extraBadge = '';
+        let actionButtons = '';
+
+        if (d.type === 'counter') {
+          extraBadge = ` • <span class="badge-progress">Progress: ${d.current}/${d.target}</span>`;
+          actionButtons = `
+            <button class="btn-minus" onclick="decrementDailyCounter(${d.id})">-1</button>
+            <button class="btn-count" onclick="incrementDailyCounter(${d.id})">+1</button> 
+            <button class="btn-action" onclick="completeDaily(${d.id})">✓</button>
+          `;
+        } else if (d.type === 'timer') {
+          extraBadge = ` • <span class="badge-progress" id="daily-time-disp-${d.id}">⏱️ ${formatTime(d.remainingSeconds)}</span>`;
+          const playBtnText = d.isRunning ? '⏸️' : '▶️';
+          actionButtons = `<button class="btn-timer" onclick="toggleDailyTimer(${d.id})">${playBtnText}</button> <button class="btn-action" onclick="completeDaily(${d.id})">✓</button>`;
+        } else {
+          actionButtons = `<button class="btn-action" style="background:var(--success); color:white; border:none;" onclick="completeDaily(${d.id})">✓ Complete</button>`;
+        }
+
         dailyList.innerHTML += `
           <div class="card daily-card">
             <div class="card-info">
               <h4>${d.title}</h4>
-              <p><span class="badge-xp">+${d.xp} XP</span> • <span class="badge-gold">+${d.gold} Gold</span>${timeBadge}</p>
+              <p><span class="badge-xp">+${d.xp} XP</span> • <span class="badge-gold">+${d.gold} Gold</span>${extraBadge}${timeBadge}</p>
             </div>
             <div class="actions">
-              <button class="btn-action" style="background:var(--success); color:white; border:none;" onclick="completeDaily(${d.id})">✓ Complete</button>
+              ${actionButtons}
               <button class="btn-delete" onclick="deleteDaily(${d.id})">🗑️</button>
             </div>
           </div>
         `;
       });
 
-      // 2. QUESTS (SORTED BY DEADLINE)
+      // 2. QUESTS
       const questList = document.getElementById('quest-list');
-      const rawQuests = userData.quests || [];
-      
-      const sortedQuests = [...rawQuests].sort((a, b) => {
+      const sortedQuests = [...(userData.quests || [])].sort((a, b) => {
         if (!a.dueDate && !b.dueDate) return 0;
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
@@ -1099,29 +810,18 @@
       });
 
       questList.innerHTML = sortedQuests.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding: 24px 0; font-weight: 600;">No active quests.</p>' : '';
-      
       sortedQuests.forEach(q => {
-        let actionButtons = '';
-        let extraBadge = '';
-        let dueBadge = '';
-
+        let actionButtons = ''; let extraBadge = ''; let dueBadge = '';
         if (q.dueDate) {
           const d = new Date(q.dueDate);
-          const formattedDate = d.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
-          dueBadge = `<br><span class="badge-due">⏳ Deadline: ${formattedDate}</span>`;
+          dueBadge = `<br><span class="badge-due">⏳ Deadline: ${d.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</span>`;
         }
-
         if (q.type === 'counter') {
           extraBadge = ` • <span class="badge-progress">Progress: ${q.current}/${q.target}</span>`;
-          actionButtons = `
-            <button class="btn-minus" onclick="decrementCounter(${q.id})">-1</button>
-            <button class="btn-count" onclick="incrementCounter(${q.id})">+1</button> 
-            <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>
-          `;
+          actionButtons = `<button class="btn-minus" onclick="decrementCounter(${q.id})">-1</button> <button class="btn-count" onclick="incrementCounter(${q.id})">+1</button> <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>`;
         } else if (q.type === 'timer') {
           extraBadge = ` • <span class="badge-progress" id="time-disp-${q.id}">⏱️ ${formatTime(q.remainingSeconds)}</span>`;
-          const playBtnText = q.isRunning ? '⏸️' : '▶️';
-          actionButtons = `<button class="btn-timer" onclick="toggleTimer(${q.id})">${playBtnText}</button> <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>`;
+          actionButtons = `<button class="btn-timer" onclick="toggleTimer(${q.id})">${q.isRunning ? '⏸️' : '▶️'}</button> <button class="btn-action" onclick="completeQuest(${q.id})">✓</button>`;
         } else {
           actionButtons = `<button class="btn-action" style="background:var(--accent); color:white; border:none;" onclick="completeQuest(${q.id})">✓ Complete</button>`;
         }
@@ -1146,17 +846,8 @@
       goalList.innerHTML = goals.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding: 24px 0; font-weight: 600;">No goals set.</p>' : '';
       goals.forEach(g => {
         goalList.innerHTML += `
-          <div class="card goal-card">
-            <div class="card-info">
-              <h4>🎯 ${g.title}</h4>
-              <p><span class="badge-xp">+${g.xp} XP</span> • <span class="badge-gold">+${g.gold} Gold</span></p>
-            </div>
-            <div class="actions">
-              <button class="btn-action" style="background:var(--goal-accent); color:white; border:none;" onclick="completeGoal(${g.id})">🏆 Complete</button>
-              <button class="btn-delete" onclick="deleteGoal(${g.id})">🗑️</button>
-            </div>
-          </div>
-        `;
+          <div class="card goal-card"><div class="card-info"><h4>🎯 ${g.title}</h4><p><span class="badge-xp">+${g.xp} XP</span> • <span class="badge-gold">+${g.gold} Gold</span></p></div>
+          <div class="actions"><button class="btn-action" style="background:var(--goal-accent); color:white; border:none;" onclick="completeGoal(${g.id})">🏆 Complete</button><button class="btn-delete" onclick="deleteGoal(${g.id})">🗑️</button></div></div>`;
       });
 
       // 4. SHOP
@@ -1165,17 +856,8 @@
       shopList.innerHTML = shop.length === 0 ? '<p style="color:var(--text-muted); text-align:center; padding: 24px 0; font-weight: 600;">No rewards in the shop.</p>' : '';
       shop.forEach(s => {
         shopList.innerHTML += `
-          <div class="card">
-            <div class="card-info">
-              <h4>${s.title}</h4>
-              <p><span class="badge-gold">${s.cost} Gold</span></p>
-            </div>
-            <div class="actions">
-              <button class="btn-action" style="background:var(--accent-gold); color:#0f172a; border:none; font-weight:800;" onclick="buyItem(${s.id})">Buy</button>
-              <button class="btn-delete" onclick="deleteShopItem(${s.id})">🗑️</button>
-            </div>
-          </div>
-        `;
+          <div class="card"><div class="card-info"><h4>${s.title}</h4><p><span class="badge-gold">${s.cost} Gold</span></p></div>
+          <div class="actions"><button class="btn-action" style="background:var(--accent-gold); color:#0f172a; border:none; font-weight:800;" onclick="buyItem(${s.id})">Buy</button><button class="btn-delete" onclick="deleteShopItem(${s.id})">🗑️</button></div></div>`;
       });
     }
 
@@ -1187,16 +869,21 @@
       const xp = parseInt(document.getElementById('daily-xp').value);
       const gold = Math.max(1, Math.round(xp / 2.5));
 
+      const type = document.getElementById('daily-type').value || 'simple';
+      const targetVal = parseInt(document.getElementById('daily-target').value) || 1;
+
+      const checkboxes = document.querySelectorAll('input[name="daily-days"]:checked');
+      const days = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+      if (days.length === 0) { alert("Please select at least one day!"); return; }
+
+      const newDaily = { id: Date.now(), title, time: timeVal, xp, gold, type, days, completedToday: false, notifiedToday: false };
+
+      if (type === 'counter') { newDaily.current = 0; newDaily.target = targetVal; } 
+      else if (type === 'timer') { newDaily.targetSeconds = targetVal * 60; newDaily.remainingSeconds = targetVal * 60; newDaily.isRunning = false; }
+
       if (!userData.dailies) userData.dailies = [];
-      userData.dailies.push({ 
-        id: Date.now(), 
-        title, 
-        time: timeVal, 
-        xp, 
-        gold, 
-        completedToday: false, 
-        notifiedToday: false 
-      });
+      userData.dailies.push(newDaily);
 
       document.getElementById('daily-title').value = '';
       document.getElementById('daily-time').value = '';
@@ -1207,13 +894,29 @@
       const daily = userData.dailies.find(d => d.id === id);
       if (!daily || daily.completedToday) return;
       daily.completedToday = true;
-      addRewards(daily.xp, daily.gold);
-      save();
+      addRewards(daily.xp, daily.gold); save();
     }
 
-    function deleteDaily(id) {
-      userData.dailies = userData.dailies.filter(d => d.id !== id);
-      save();
+    function deleteDaily(id) { userData.dailies = userData.dailies.filter(d => d.id !== id); save(); }
+
+    function incrementDailyCounter(id) {
+      const d = userData.dailies.find(item => item.id === id);
+      if (!d) return;
+      d.current += 1;
+      if (d.current >= d.target) completeDaily(id);
+      else { save(); showToast(`Progress: ${d.current}/${d.target}!`); }
+    }
+
+    function decrementDailyCounter(id) {
+      const d = userData.dailies.find(item => item.id === id);
+      if (!d) return;
+      if (d.current > 0) { d.current -= 1; save(); showToast(`Progress: ${d.current}/${d.target}`); }
+    }
+
+    function toggleDailyTimer(id) {
+      const d = userData.dailies.find(item => item.id === id);
+      if (!d) return;
+      d.isRunning = !d.isRunning; save();
     }
 
     function addQuest(e) {
@@ -1232,9 +935,7 @@
 
       if (!userData.quests) userData.quests = [];
       userData.quests.push(newQuest);
-      document.getElementById('quest-title').value = '';
-      document.getElementById('quest-due').value = '';
-      save();
+      document.getElementById('quest-title').value = ''; document.getElementById('quest-due').value = ''; save();
     }
 
     function addGoal(e) {
@@ -1242,150 +943,71 @@
       const title = document.getElementById('goal-title').value;
       const xp = parseInt(document.getElementById('goal-xp').value);
       const gold = Math.round(xp / 2.5);
-
       if (!userData.goals) userData.goals = [];
       userData.goals.push({ id: Date.now(), title, xp, gold });
-      document.getElementById('goal-title').value = '';
-      save();
+      document.getElementById('goal-title').value = ''; save();
     }
 
-    function incrementCounter(id) {
-      const q = userData.quests.find(item => item.id === id);
-      if (!q) return;
-      q.current += 1;
-      if (q.current >= q.target) completeQuest(id);
-      else { save(); showToast(`Progress: ${q.current}/${q.target}!`); }
-    }
-
-    function decrementCounter(id) {
-      const q = userData.quests.find(item => item.id === id);
-      if (!q) return;
-      if (q.current > 0) {
-        q.current -= 1;
-        save();
-        showToast(`Progress: ${q.current}/${q.target}`);
-      }
-    }
-
-    function toggleTimer(id) {
-      const q = userData.quests.find(item => item.id === id);
-      if (!q) return;
-      q.isRunning = !q.isRunning;
-      save();
-    }
+    function incrementCounter(id) { const q = userData.quests.find(item => item.id === id); if (!q) return; q.current += 1; if (q.current >= q.target) completeQuest(id); else { save(); showToast(`Progress: ${q.current}/${q.target}!`); } }
+    function decrementCounter(id) { const q = userData.quests.find(item => item.id === id); if (!q) return; if (q.current > 0) { q.current -= 1; save(); showToast(`Progress: ${q.current}/${q.target}`); } }
+    function toggleTimer(id) { const q = userData.quests.find(item => item.id === id); if (!q) return; q.isRunning = !q.isRunning; save(); }
 
     function addRewards(xpGained, goldGained) {
-      userData.xp += xpGained;
-      userData.gold += goldGained;
-
-      let maxXp = userData.level * 100;
-      let levelUps = 0;
-      while (userData.xp >= maxXp) {
-        userData.xp -= maxXp;
-        userData.level += 1;
-        levelUps++;
-        maxXp = userData.level * 100;
-      }
-
-      if (levelUps > 0) showToast(`🎉 LEVEL UP! Level ${userData.level}! 🎉`);
-      else showToast(`+${xpGained} XP | +${goldGained} Gold!`);
+      userData.xp += xpGained; userData.gold += goldGained;
+      let maxXp = userData.level * 100; let levelUps = 0;
+      while (userData.xp >= maxXp) { userData.xp -= maxXp; userData.level += 1; levelUps++; maxXp = userData.level * 100; }
+      if (levelUps > 0) showToast(`🎉 LEVEL UP! Level ${userData.level}! 🎉`); else showToast(`+${xpGained} XP | +${goldGained} Gold!`);
     }
 
-    function completeQuest(id) {
-      const quest = userData.quests.find(q => q.id === id);
-      if (!quest) return;
-      addRewards(quest.xp, quest.gold);
-      userData.quests = userData.quests.filter(q => q.id !== id);
-      save();
-    }
-
-    function completeGoal(id) {
-      const goal = userData.goals.find(g => g.id === id);
-      if (!goal) return;
-      if (confirm(`Completed: "${goal.title}"?`)) {
-        addRewards(goal.xp, goal.gold);
-        userData.goals = userData.goals.filter(g => g.id !== id);
-        save();
-      }
-    }
-
+    function completeQuest(id) { const quest = userData.quests.find(q => q.id === id); if (!quest) return; addRewards(quest.xp, quest.gold); userData.quests = userData.quests.filter(q => q.id !== id); save(); }
+    function completeGoal(id) { const goal = userData.goals.find(g => g.id === id); if (!goal) return; if (confirm(`Completed: "${goal.title}"?`)) { addRewards(goal.xp, goal.gold); userData.goals = userData.goals.filter(g => g.id !== id); save(); } }
     function deleteQuest(id) { userData.quests = userData.quests.filter(q => q.id !== id); save(); }
     function deleteGoal(id) { userData.goals = userData.goals.filter(g => g.id !== id); save(); }
 
     function addShopItem(e) {
       e.preventDefault();
-      const title = document.getElementById('item-title').value;
-      const cost = parseInt(document.getElementById('item-cost').value);
-      if (!userData.shop) userData.shop = [];
-      userData.shop.push({ id: Date.now(), title, cost });
-      document.getElementById('item-title').value = '';
-      document.getElementById('item-cost').value = '';
-      save();
+      const title = document.getElementById('item-title').value; const cost = parseInt(document.getElementById('item-cost').value);
+      if (!userData.shop) userData.shop = []; userData.shop.push({ id: Date.now(), title, cost });
+      document.getElementById('item-title').value = ''; document.getElementById('item-cost').value = ''; save();
     }
-
-    function buyItem(id) {
-      const item = userData.shop.find(s => s.id === id);
-      if (!item) return;
-      if (userData.gold >= item.cost) {
-        userData.gold -= item.cost;
-        showToast(`Purchased: ${item.title}! 🎁`);
-        save();
-      } else alert('Not enough gold!');
-    }
-
+    function buyItem(id) { const item = userData.shop.find(s => s.id === id); if (!item) return; if (userData.gold >= item.cost) { userData.gold -= item.cost; showToast(`Purchased: ${item.title}! 🎁`); save(); } else alert('Not enough gold!'); }
     function deleteShopItem(id) { userData.shop = userData.shop.filter(s => s.id !== id); save(); }
 
-    function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.style.display = 'block';
-      setTimeout(() => toast.style.display = 'none', 3000);
-    }
+    function showToast(msg) { const toast = document.getElementById('toast'); toast.innerText = msg; toast.style.display = 'block'; setTimeout(() => toast.style.display = 'none', 3000); }
 
     // CHECK INTERVAL FOR TIMERS, DEADLINES & NOTIFICATIONS
     setInterval(() => {
       if (!userData) return;
-      
       checkDailyReset();
-
-      const nowObj = new Date();
-      const now = nowObj.getTime();
-      const currentHours = nowObj.getHours().toString().padStart(2, '0');
-      const currentMinutes = nowObj.getMinutes().toString().padStart(2, '0');
+      const nowObj = new Date(); const now = nowObj.getTime();
+      const currentHours = nowObj.getHours().toString().padStart(2, '0'); const currentMinutes = nowObj.getMinutes().toString().padStart(2, '0');
       const currentTimeStr = `${currentHours}:${currentMinutes}`;
-
       let hasChanges = false;
 
-      // 1. CHECK DAILY TIME REMINDERS
       if (userData.dailies) {
         userData.dailies.forEach(d => {
           if (d.time && !d.completedToday && !d.notifiedToday && d.time === currentTimeStr) {
-            d.notifiedToday = true;
-            hasChanges = true;
-            sendNotification('📅 Scheduled Habit', `Time for: "${d.title}"!`);
+            d.notifiedToday = true; hasChanges = true; sendNotification('📅 Scheduled Habit', `Time for: "${d.title}"!`);
+          }
+          if (d.type === 'timer' && d.isRunning && !d.completedToday) {
+            if (d.remainingSeconds > 0) {
+              d.remainingSeconds--;
+              const disp = document.getElementById(`daily-time-disp-${d.id}`);
+              if (disp) disp.innerText = `⏱️ ${formatTime(d.remainingSeconds)}`;
+            } else {
+              d.isRunning = false; sendNotification('⏱️ Daily Timer Finished!', `The timer for "${d.title}" is complete!`);
+              completeDaily(d.id); hasChanges = true;
+            }
           }
         });
       }
 
-      // 2. CHECK QUEST DEADLINES & TIMERS
       if (userData.quests) {
         userData.quests = userData.quests.filter(q => {
           if (q.dueDate) {
-            const dueTime = new Date(q.dueDate).getTime();
-            const timeLeft = dueTime - now;
-
-            if (timeLeft > 0 && timeLeft <= 15 * 60 * 1000 && !q.warned) {
-              q.warned = true;
-              hasChanges = true;
-              sendNotification('⏰ Deadline approaching!', `Less than 15 min left for: "${q.title}"!`);
-            }
-
-            if (now >= dueTime) {
-              showToast(`❌ Quest expired: "${q.title}"!`);
-              sendNotification('❌ Quest Expired', `The deadline for "${q.title}" has passed.`);
-              hasChanges = true;
-              return false;
-            }
+            const timeLeft = new Date(q.dueDate).getTime() - now;
+            if (timeLeft > 0 && timeLeft <= 15 * 60 * 1000 && !q.warned) { q.warned = true; hasChanges = true; sendNotification('⏰ Deadline approaching!', `Less than 15 min left for: "${q.title}"!`); }
+            if (now >= new Date(q.dueDate).getTime()) { showToast(`❌ Quest expired: "${q.title}"!`); sendNotification('❌ Quest Expired', `The deadline for "${q.title}" has passed.`); hasChanges = true; return false; }
           }
           return true;
         });
@@ -1396,15 +1018,10 @@
               q.remainingSeconds--;
               const disp = document.getElementById(`time-disp-${q.id}`);
               if (disp) disp.innerText = `⏱️ ${formatTime(q.remainingSeconds)}`;
-            } else {
-              q.isRunning = false;
-              sendNotification('⏱️ Timer Finished!', `The timer for "${q.title}" is complete!`);
-              completeQuest(q.id);
-            }
+            } else { q.isRunning = false; sendNotification('⏱️ Timer Finished!', `The timer for "${q.title}" is complete!`); completeQuest(q.id); }
           }
         });
       }
-
       if (hasChanges) save();
     }, 1000);
   </script>
@@ -1412,47 +1029,21 @@
   <!-- PWA SERVICE WORKER & UPDATE LOGIC -->
   <script>
     let newWorker;
-
-    function updateApp() {
-      if (newWorker) {
-        newWorker.postMessage({ action: 'skipWaiting' });
-      }
-      window.location.reload();
-    }
-
+    function updateApp() { if (newWorker) { newWorker.postMessage({ action: 'skipWaiting' }); } window.location.reload(); }
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then(reg => {
-          
-          if (reg.waiting) {
-            newWorker = reg.waiting;
-            showUpdateToast();
-          }
-
+          if (reg.waiting) { newWorker = reg.waiting; showUpdateToast(); }
           reg.addEventListener('updatefound', () => {
             newWorker = reg.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                showUpdateToast();
-              }
-            });
+            newWorker.addEventListener('statechange', () => { if (newWorker.state === 'installed' && navigator.serviceWorker.controller) { showUpdateToast(); } });
           });
         });
-
         let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (!refreshing) {
-            refreshing = true;
-            window.location.reload();
-          }
-        });
+        navigator.serviceWorker.addEventListener('controllerchange', () => { if (!refreshing) { refreshing = true; window.location.reload(); } });
       });
     }
-
-    function showUpdateToast() {
-      const toast = document.getElementById('update-toast');
-      if (toast) toast.style.display = 'flex';
-    }
+    function showUpdateToast() { const toast = document.getElementById('update-toast'); if (toast) toast.style.display = 'flex'; }
   </script>
 </body>
 </html>
