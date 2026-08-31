@@ -108,6 +108,7 @@
     .auth-toggle, .auth-forgot { background: none; border: none; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; text-decoration: none; font-family: inherit; transition: color 0.2s; }
     .auth-toggle:hover { color: var(--text-main); }
     .auth-forgot { color: var(--accent-gold); }
+    .auth-forgot:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* MAIN APP */
     #app-screen { display: none; }
@@ -261,6 +262,8 @@
       <div class="auth-links">
         <button type="button" class="auth-toggle" id="auth-toggle-btn" onclick="toggleAuthMode()">Don't have an account? Register here</button>
         <button type="button" class="auth-forgot" id="auth-forgot-btn" onclick="sendPasswordReset()">Forgot password?</button>
+        <!-- Stap 3: Handige tip toegevoegd onder de knop -->
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4; text-align: left;">⚠️ Vraag je een nieuw wachtwoord aan? Klik dan maar één keer op de knop en check ook je spam-folder als je mail niet binnenkomt.</p>
       </div>
     </div>
   </div>
@@ -422,10 +425,10 @@
       <div style="max-height: 320px; overflow-y: auto; margin-bottom: 16px; padding-right: 4px;">
         
         <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 10px; margin-bottom: 12px;">
-          <h4 style="color: var(--accent-gold); font-size: 0.95rem;">🚀 Version 8.2 (Advanced Dailies)</h4>
+          <h4 style="color: var(--accent-gold); font-size: 0.95rem;">🚀 Version 8.2 (Advanced Dailies & Safety)</h4>
           <ul class="help-step-list" style="margin-left: 16px; margin-top: 6px;">
-            <li><strong>📅 Specific Days:</strong> You can now select exactly which days of the week a Daily should appear (e.g., Workouts only on Tue/Thu).</li>
-            <li><strong>⏱️ Daily Timers & Counters:</strong> Set up a Daily to track a specific amount (e.g., drink 3 waters) or run a timer (e.g., 30 mins reading).</li>
+            <li><strong>📅 Specific Days:</strong> You can now select exactly which days of the week a Daily should appear.</li>
+            <li><strong>🛡️ Safe Password Reset:</strong> Prevent accidental double-submits when requesting a password reset email.</li>
           </ul>
         </div>
 
@@ -517,11 +520,29 @@
       document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? 'Already have an account? Log in' : "Don't have an account? Register here";
     }
 
+    // Stap 2: Voorkom dubbelklikken door de knop tijdelijk uit te schakelen
     function sendPasswordReset() {
       const email = prompt('Enter your email address for a reset link:');
       if (email) {
         if (typeof auth === 'undefined' || !auth) { alert('Firebase is not initialized!'); return; }
-        auth.sendPasswordResetEmail(email.trim()).then(() => alert('Reset email sent! Check your inbox.')).catch(err => alert('Error: ' + err.message));
+        
+        const forgotBtn = document.getElementById('auth-forgot-btn');
+        if (forgotBtn) {
+          forgotBtn.disabled = true;
+        }
+
+        auth.sendPasswordResetEmail(email.trim())
+          .then(() => {
+            alert('Reset email sent! Check your inbox.');
+            // Na 15 seconden pas weer inschakelen zodat ze niet dubbelklikken maar wel opnieuw kunnen proberen indien nodig
+            setTimeout(() => {
+              if (forgotBtn) forgotBtn.disabled = false;
+            }, 15000);
+          })
+          .catch(err => {
+            alert('Error: ' + err.message);
+            if (forgotBtn) forgotBtn.disabled = false;
+          });
       }
     }
 
