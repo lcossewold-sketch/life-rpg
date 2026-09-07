@@ -1,4 +1,4 @@
-const CACHE_NAME = 'life-rpg-v8.6';
+const CACHE_NAME = 'life-rpg-v8.7';
 
 const ASSETS_TO_CACHE = [
   './',
