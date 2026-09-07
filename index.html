@@ -520,7 +520,7 @@
       document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? 'Already have an account? Log in' : "Don't have an account? Register here";
     }
 
-    // Stap 2: Voorkom dubbelklikken door de knop tijdelijk uit te schakelen
+    // Geüpdatete functie om wachtwoord link met ActionCodeSettings te verzenden
     function sendPasswordReset() {
       const email = prompt('Enter your email address for a reset link:');
       if (email) {
@@ -531,10 +531,16 @@
           forgotBtn.disabled = true;
         }
 
-        auth.sendPasswordResetEmail(email.trim())
+        // Stuur de instellingen mee voor in-app link verwerking
+        const actionCodeSettings = {
+          url: window.location.origin + window.location.pathname,
+          handleCodeInApp: true
+        };
+
+        auth.sendPasswordResetEmail(email.trim(), actionCodeSettings)
           .then(() => {
-            alert('Reset email sent! Check your inbox.');
-            // Na 15 seconden pas weer inschakelen zodat ze niet dubbelklikken maar wel opnieuw kunnen proberen indien nodig
+            alert('Reset email sent! Check your inbox (and spam folder).');
+            // Na 15 seconden pas weer inschakelen zodat ze niet dubbelklikken
             setTimeout(() => {
               if (forgotBtn) forgotBtn.disabled = false;
             }, 15000);
