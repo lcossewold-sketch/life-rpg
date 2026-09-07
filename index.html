@@ -262,7 +262,6 @@
       <div class="auth-links">
         <button type="button" class="auth-toggle" id="auth-toggle-btn" onclick="toggleAuthMode()">Don't have an account? Register here</button>
         <button type="button" class="auth-forgot" id="auth-forgot-btn" onclick="sendPasswordReset()">Forgot password?</button>
-        <!-- Stap 3: Handige tip toegevoegd onder de knop -->
         <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4; text-align: left;">⚠️ Vraag je een nieuw wachtwoord aan? Klik dan maar één keer op de knop en check ook je spam-folder als je mail niet binnenkomt.</p>
       </div>
     </div>
@@ -423,7 +422,6 @@
     <div class="modal-content">
       <h3>✨ New in Life RPG</h3>
       <div style="max-height: 320px; overflow-y: auto; margin-bottom: 16px; padding-right: 4px;">
-        
         <div style="border-bottom: 1px solid var(--card-border); padding-bottom: 10px; margin-bottom: 12px;">
           <h4 style="color: var(--accent-gold); font-size: 0.95rem;">🚀 Version 8.2 (Advanced Dailies & Safety)</h4>
           <ul class="help-step-list" style="margin-left: 16px; margin-top: 6px;">
@@ -431,7 +429,6 @@
             <li><strong>🛡️ Safe Password Reset:</strong> Prevent accidental double-submits when requesting a password reset email.</li>
           </ul>
         </div>
-
       </div>
       <div class="modal-footer">
         <button class="modal-btn" onclick="document.getElementById('updates-modal').style.display='none';">Got it! 👍</button>
@@ -471,7 +468,6 @@
           <button class="modal-btn" onclick="document.getElementById('tutorial-modal').style.display='none';">Got it! 👍</button>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -499,6 +495,7 @@
 
     function updateNetworkStatus() {
       const statusTag = document.getElementById('network-status');
+      if (!statusTag) return;
       if (navigator.onLine) {
         statusTag.innerText = '🟢 Online';
         statusTag.style.color = '#10b981';
@@ -520,33 +517,27 @@
       document.getElementById('auth-toggle-btn').innerText = isRegisterMode ? 'Already have an account? Log in' : "Don't have an account? Register here";
     }
 
-    // Geüpdatete functie om wachtwoord link met ActionCodeSettings te verzenden
     function sendPasswordReset() {
       const email = prompt('Enter your email address for a reset link:');
       if (email) {
         if (typeof auth === 'undefined' || !auth) { alert('Firebase is not initialized!'); return; }
         
         const forgotBtn = document.getElementById('auth-forgot-btn');
-        if (forgotBtn) {
-          forgotBtn.disabled = true;
-        }
+        if (forgotBtn) forgotBtn.disabled = true;
 
-        // Stuur de instellingen mee voor in-app link verwerking
-        const actionCodeSettings = {
-          url: window.location.origin + window.location.pathname,
-          handleCodeInApp: true
-        };
-
-        auth.sendPasswordResetEmail(email.trim(), actionCodeSettings)
+        auth.sendPasswordResetEmail(email.trim())
           .then(() => {
             alert('Reset email sent! Check your inbox (and spam folder).');
-            // Na 15 seconden pas weer inschakelen zodat ze niet dubbelklikken
             setTimeout(() => {
               if (forgotBtn) forgotBtn.disabled = false;
             }, 15000);
           })
           .catch(err => {
-            alert('Error: ' + err.message);
+            if (err.code === 'auth/network-request-failed') {
+              alert('Netwerkfout: Schakel je adblocker uit of controleer je internetverbinding.');
+            } else {
+              alert('Error: ' + err.message);
+            }
             if (forgotBtn) forgotBtn.disabled = false;
           });
       }
@@ -563,6 +554,7 @@
 
     function syncNotificationUI() {
       const btn = document.getElementById('notif-toggle-btn');
+      if (!btn) return;
       const isGranted = 'Notification' in window && Notification.permission === 'granted';
       const isSavedOn = userData && userData.notificationsEnabled === true;
       if (isGranted && isSavedOn) { btn.innerHTML = '🔔 Notifs: ON'; btn.classList.add('active-notif'); } 
@@ -609,7 +601,6 @@
       firebase.initializeApp(firebaseConfig);
       auth = firebase.auth();
       database = firebase.database();
-      auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     } catch (e) { console.error("Firebase config error:", e); }
 
     let currentUser = null;
@@ -626,22 +617,13 @@
       return null;
     }
 
-    const cachedLocal = loadLocalData();
-    if (cachedLocal) {
-      userData = cachedLocal;
-      document.getElementById('loading-screen').style.display = 'none';
-      document.getElementById('app-screen').style.display = 'block';
-      checkDailyReset(); render();
-    }
-
     if (auth) {
       auth.onAuthStateChanged(async (user) => {
-        updateNetworkStatus();
         document.getElementById('loading-screen').style.display = 'none';
         
         if (user) {
           currentUser = user;
-          document.getElementById('user-display').innerText = user.email.split('@')[0];
+          document.getElementById('user-display').innerText = user.email ? user.email.split('@')[0] : 'Hero';
           document.getElementById('auth-screen').style.display = 'none';
           document.getElementById('app-screen').style.display = 'block';
 
@@ -661,15 +643,21 @@
             } catch (err) { console.log('Could not fetch cloud data, using local data.'); }
           }
 
-          if (!userData) userData = JSON.parse(JSON.stringify(defaultUserData));
-          checkDailyReset(); saveLocally(); render();
+          if (!userData) userData = loadLocalData() || JSON.parse(JSON.stringify(defaultUserData));
+          checkDailyReset(); saveLocally(); render(); updateNetworkStatus();
           if (!userData.hasSeenTutorial) startTutorial();
         } else {
-          if (!cachedLocal) { currentUser = null; userData = null; document.getElementById('app-screen').style.display = 'none'; document.getElementById('auth-screen').style.display = 'flex'; }
+          currentUser = null;
+          userData = null;
+          document.getElementById('app-screen').style.display = 'none';
+          document.getElementById('auth-screen').style.display = 'flex';
         }
       });
     } else {
-      setTimeout(() => { document.getElementById('loading-screen').style.display = 'none'; if (!cachedLocal) document.getElementById('auth-screen').style.display = 'flex'; }, 1000);
+      setTimeout(() => { 
+        document.getElementById('loading-screen').style.display = 'none'; 
+        document.getElementById('auth-screen').style.display = 'flex'; 
+      }, 1000);
     }
 
     async function handleAuth(e) {
@@ -678,12 +666,27 @@
       const email = document.getElementById('auth-email').value.trim();
       const pass = document.getElementById('auth-pass').value.trim();
       try {
-        if (isRegisterMode) { await auth.createUserWithEmailAndPassword(email, pass); showToast('Account created! Welcome!'); } 
-        else { await auth.signInWithEmailAndPassword(email, pass); showToast('Welcome back!'); }
-      } catch (err) { alert('Authentication Error: ' + err.message); }
+        if (isRegisterMode) { 
+          await auth.createUserWithEmailAndPassword(email, pass); 
+          showToast('Account created! Welcome!'); 
+        } else { 
+          await auth.signInWithEmailAndPassword(email, pass); 
+          showToast('Welcome back!'); 
+        }
+      } catch (err) { 
+        if (err.code === 'auth/network-request-failed') {
+          alert('Netwerkfout (auth/network-request-failed):\nControleer je internetverbinding, zet adblockers/extensies uit of voeg lcossewold-sketch.github.io toe in Firebase Console bij Authorized Domains.');
+        } else {
+          alert('Authentication Error: ' + err.message); 
+        }
+      }
     }
 
-    function logout() { localStorage.removeItem('lifeRpgUserData'); if (auth) auth.signOut(); window.location.reload(); }
+    function logout() { 
+      localStorage.removeItem('lifeRpgUserData'); 
+      if (auth) auth.signOut(); 
+      window.location.reload(); 
+    }
 
     function checkDailyReset() {
       if (!userData) return;
@@ -730,7 +733,7 @@
     function nextTutorialStep() {
       tutStep++;
       if (tutStep < tutSteps.length) showTutStep();
-      else { document.getElementById('tutorial-modal').style.display = 'none'; userData.hasSeenTutorial = true; save(); }
+      else { document.getElementById('tutorial-modal').style.display = 'none'; if(userData) { userData.hasSeenTutorial = true; save(); } }
     }
 
     function switchTab(tabId, btn) {
@@ -775,9 +778,8 @@
 
       // 1. DAILIES
       const dailyList = document.getElementById('daily-list');
-      const todayDay = new Date().getDay(); // 0=Sun, 1=Mon, etc.
+      const todayDay = new Date().getDay();
 
-      // Filter Dailies: not completed AND valid for today's day
       const activeDailies = (userData.dailies || []).filter(d => {
         const isToday = d.days ? d.days.includes(todayDay) : true;
         return !d.completedToday && isToday;
@@ -921,6 +923,7 @@
       const daily = userData.dailies.find(d => d.id === id);
       if (!daily || daily.completedToday) return;
       daily.completedToday = true;
+      daily.isRunning = false;
       addRewards(daily.xp, daily.gold); save();
     }
 
@@ -1030,6 +1033,7 @@
       }
 
       if (userData.quests) {
+        const questsToComplete = [];
         userData.quests = userData.quests.filter(q => {
           if (q.dueDate) {
             const timeLeft = new Date(q.dueDate).getTime() - now;
@@ -1045,9 +1049,18 @@
               q.remainingSeconds--;
               const disp = document.getElementById(`time-disp-${q.id}`);
               if (disp) disp.innerText = `⏱️ ${formatTime(q.remainingSeconds)}`;
-            } else { q.isRunning = false; sendNotification('⏱️ Timer Finished!', `The timer for "${q.title}" is complete!`); completeQuest(q.id); }
+            } else { 
+              q.isRunning = false; 
+              sendNotification('⏱️ Timer Finished!', `The timer for "${q.title}" is complete!`); 
+              questsToComplete.push(q.id);
+            }
           }
         });
+
+        if (questsToComplete.length > 0) {
+          questsToComplete.forEach(id => completeQuest(id));
+          hasChanges = false;
+        }
       }
       if (hasChanges) save();
     }, 1000);
@@ -1065,7 +1078,8 @@
             newWorker = reg.installing;
             newWorker.addEventListener('statechange', () => { if (newWorker.state === 'installed' && navigator.serviceWorker.controller) { showUpdateToast(); } });
           });
-        });
+        }).catch(err => console.log('SW registration skipped or failed:', err));
+        
         let refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => { if (!refreshing) { refreshing = true; window.location.reload(); } });
       });
