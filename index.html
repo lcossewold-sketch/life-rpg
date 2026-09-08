@@ -129,6 +129,9 @@
       border: 1px solid var(--card-border); box-shadow: var(--shadow-soft); position: relative; 
     }
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 0.85rem; color: var(--text-muted); }
+    .hero-profile { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .profile-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(139, 92, 246, 0.7); display: none; flex-shrink: 0; background: var(--input-bg); }
+    .profile-avatar-fallback { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--accent), var(--accent-purple)); font-size: 1rem; flex-shrink: 0; }
     .status-tag { font-size: 0.72rem; padding: 3px 8px; border-radius: 20px; background: rgba(255, 255, 255, 0.06); font-weight: 600; margin-left: 6px; }
     
     .profile { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -285,7 +288,12 @@
   <div id="app-screen">
     <div class="header">
       <div class="top-bar">
-        <span>Hero: <strong id="user-display" style="color: var(--text-main);">Player</strong> <span id="network-status" class="status-tag">🟢 Online</span></span>
+        <!-- GOOGLE PROFILE DISPLAY ADDED -->
+        <span class="hero-profile">
+          <img id="profile-avatar" class="profile-avatar" alt="Google profile">
+          <span id="profile-avatar-fallback" class="profile-avatar-fallback">🧙</span>
+          <span>Hero: <strong id="user-display" style="color: var(--text-main);">Player</strong> <span id="network-status" class="status-tag">🟢 Online</span></span>
+        </span>
         <div class="header-btns">
           <button class="icon-btn" onclick="openUpdatesModal()">✨ Updates</button>
           <button class="icon-btn" id="notif-toggle-btn" onclick="toggleNotificationSetting()">🔔 Notifs</button>
@@ -563,6 +571,30 @@
       }
     }
 
+    // <!-- GOOGLE PROFILE DISPLAY ADDED -->
+    function updateGoogleProfile(user) {
+      const nameEl = document.getElementById('user-display');
+      const avatarEl = document.getElementById('profile-avatar');
+      const fallbackEl = document.getElementById('profile-avatar-fallback');
+      if (!nameEl) return;
+
+      const displayName = user && user.displayName ? user.displayName : (user && user.email ? user.email.split('@')[0] : 'Hero');
+      nameEl.innerText = displayName;
+
+      if (avatarEl && fallbackEl && user && user.photoURL) {
+        avatarEl.src = user.photoURL;
+        avatarEl.style.display = 'block';
+        fallbackEl.style.display = 'none';
+        avatarEl.onerror = () => {
+          avatarEl.style.display = 'none';
+          fallbackEl.style.display = 'flex';
+        };
+      } else if (avatarEl && fallbackEl) {
+        avatarEl.style.display = 'none';
+        fallbackEl.style.display = 'flex';
+      }
+    }
+
     function toggleAuthMode() {
       isRegisterMode = !isRegisterMode;
       document.getElementById('auth-title').innerText = isRegisterMode ? '✨ Create Account' : '🎮 Life RPG';
@@ -677,7 +709,7 @@
         
         if (user) {
           currentUser = user;
-          document.getElementById('user-display').innerText = user.email ? user.email.split('@')[0] : 'Hero';
+          updateGoogleProfile(user);
           document.getElementById('auth-screen').style.display = 'none';
           document.getElementById('app-screen').style.display = 'block';
 
