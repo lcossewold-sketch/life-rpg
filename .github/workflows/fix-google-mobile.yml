@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Patch Google login
+      - name: Patch Google login safely
         shell: python
         run: |
           from pathlib import Path
@@ -23,85 +23,97 @@ jobs:
           path = Path('index.html')
           text = path.read_text(encoding='utf-8')
 
-          # Remove the G letter that was shown before the Google button text.
-          text = text.replace('<span style="font-size:1.1rem;">G</span> Continue with Google', 'Continue with Google')
-          text = text.replace('>G</span> Continue with Google', '>Continue with Google')
+          # Remove every visible G prefix from the Google button.
+          text = re.sub(r'<span[^>]*>G</span>\s*Continue with Google', 'Continue with Google', text)
+          text = text.replace('>G Connecting...</', '>Connecting...</')
+          text = text.replace('>G Continue with Google</', '>Continue with Google</')
 
-          # Use redirect instead of popup. This is much more reliable on phones/PWA installs.
-          old = '''async function loginWithGoogle() {
-      const googleBtn = document.getElementById('google-login-btn');
-      try {
-        if (googleBtn) googleBtn.disabled = true;
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-        await auth.signInWithPopup(provider);
-      } catch (error) {
-        console.error('Google login error:', error);
-        if (error.code === 'auth/popup-closed-by-user') {
-          showAuthError('Google login was cancelled.');
-        } else if (error.code === 'auth/popup-blocked') {
-          showAuthError('Google login popup was blocked. Please allow popups and try again.');
-        } else if (error.code === 'auth/account-exists-with-different-credential') {
-          showAuthError('An account with this email already exists. Log in with your email and password first.');
-        } else if (error.code === 'auth/unauthorized-domain') {
-          showAuthError('This app domain is not authorized in Firebase. Add the current domain under Authentication > Settings > Authorized domains.');
-        } else {
-          showAuthError(error.message || 'Google login failed.');
-        }
-      } finally {
-        if (googleBtn) googleBtn.disabled = false;
+          # Replace the complete Google login function, regardless of the old error-handler text.
+          start = text.find('async function loginWithGoogle() {')
+          if start == -1:
+              raise SystemExit('Could not find loginWithGoogle()')
+
+          end = text.find('\n    // <!-- GOOGLE PROFILE DISPLAY ADDED -->', start)
+          if end == -1:
+              raise SystemExit('Could not find end of loginWithGoogle()')
+
+          new_function = '''async function loginWithGoogle() {
+      if (!auth) {
+        alert("Firebase is not initialized!");
+        return;
       }
-    }'''
 
-          new = '''async function loginWithGoogle() {
-      const googleBtn = document.getElementById('google-login-btn');
+      const btn = document.getElementById('google-login-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Connecting...';
+      }
+
       try {
-        if (googleBtn) googleBtn.disabled = true;
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
-        // Redirect works reliably on mobile browsers and installed PWAs.
+        // Redirect is the recommended Firebase flow for mobile browsers.
         await auth.signInWithRedirect(provider);
-      } catch (error) {
-        console.error('Google login error:', error);
-        if (error.code === 'auth/unauthorized-domain') {
-          showAuthError('This app domain is not authorized in Firebase. Add the current domain under Authentication > Settings > Authorized domains.');
-        } else if (error.code === 'auth/operation-not-supported-in-this-environment') {
-          showAuthError('Google login is not supported in this browser environment. Open Life RPG in Chrome or Safari and try again.');
+      } catch (err) {
+        console.error('Google sign-in error:', err);
+        if (err.code === 'auth/unauthorized-domain') {
+          alert('This website is not authorized in Firebase. Check Authentication → Settings → Authorized domains.');
+        } else if (err.code === 'auth/operation-not-supported-in-this-environment') {
+          alert('Google login is not supported in this browser environment. Open Life RPG in Chrome or Edge and try again.');
         } else {
-          showAuthError(error.message || 'Google login failed.');
+          alert('Google login failed: ' + (err.message || err.code));
         }
-        if (googleBtn) googleBtn.disabled = false;
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Continue with Google';
+        }
       }
     }'''
 
-          if old in text:
-              text = text.replace(old, new, 1)
-          elif 'signInWithPopup(provider)' in text:
-              text = text.replace('await auth.signInWithPopup(provider);', 'await auth.signInWithRedirect(provider);', 1)
+          text = text[:start] + new_function + text[end:]
 
-          # Process the result after Google redirects back to Life RPG.
+          # Add redirect-result handling once, before the auth state listener.
           marker = '// GOOGLE REDIRECT RESULT ADDED'
           if marker not in text:
-              redirect_code = '''\n    // GOOGLE REDIRECT RESULT ADDED\n    auth.getRedirectResult().then((result) => {\n      if (result && result.user) {\n        console.log('Google login successful:', result.user.email);\n      }\n    }).catch((error) => {\n      console.error('Google redirect login error:', error);\n      if (typeof showAuthError === 'function') {\n        if (error.code === 'auth/unauthorized-domain') {\n          showAuthError('This app domain is not authorized in Firebase. Add the current domain under Authentication > Settings > Authorized domains.');\n        } else {\n          showAuthError(error.message || 'Google login failed.');\n        }\n      }\n    });\n'''
+              redirect_code = '''    // GOOGLE REDIRECT RESULT ADDED
+    auth.getRedirectResult().then((result) => {
+      if (result && result.user) {
+        console.log('Google login successful:', result.user.email);
+      }
+    }).catch((error) => {
+      console.error('Google redirect login error:', error);
+      if (error.code === 'auth/unauthorized-domain') {
+        console.error('Unauthorized Firebase domain:', window.location.hostname);
+      }
+    });
+
+'''
               pos = text.find('auth.onAuthStateChanged(')
-              if pos != -1:
-                  text = text[:pos] + redirect_code + '\n    ' + text[pos:]
+              if pos == -1:
+                  raise SystemExit('Could not find auth.onAuthStateChanged()')
+              text = text[:pos] + redirect_code + text[pos:]
 
           path.write_text(text, encoding='utf-8')
-          print('Patched index.html')
+          print('Google mobile login patch applied.')
 
-      - name: Commit changes
+      - name: Commit patched app
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git diff --cached --quiet && exit 0
-          git commit -m "Fix Google login for mobile and remove G icon"
+          if git diff --cached --quiet; then
+            echo "No app changes needed."
+            exit 0
+          fi
+          git commit -m "Fix Google login for mobile"
           git push
 
-      - name: Remove one-time workflow
+      - name: Remove one-time fixer
         if: success()
         run: |
-          git rm .github/workflows/fix-google-mobile.yml
-          git commit -m "Remove one-time Google login fix workflow"
+          git rm .github/workflows/fix-google-mobile.yml || true
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Remove one-time Google login fixer"
           git push
