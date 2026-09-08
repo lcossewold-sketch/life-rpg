@@ -1,4 +1,4 @@
-name: Add Google Login
+name: Repair Google Login
 
 on:
   push:
@@ -9,54 +9,100 @@ permissions:
   contents: write
 
 jobs:
-  patch:
+  repair:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Add Google login
+      - name: Repair Google mobile login
         shell: python
         run: |
           from pathlib import Path
+          import re
 
-          path = Path("index.html")
-          text = path.read_text(encoding="utf-8")
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
 
-          marker = "<!-- GOOGLE LOGIN ADDED -->"
-          if marker in text:
-              print("Google login is already installed.")
-              raise SystemExit(0)
+          # Remove the visible G prefix from every Google button variant.
+          text = re.sub(r'<span[^>]*>G</span>\s*Continue with Google', 'Continue with Google', text)
+          text = text.replace('>G Connecting...</', '>Connecting...</')
+          text = text.replace('>G Continue with Google</', '>Continue with Google</')
 
-          old_css = """    .auth-btn:active { transform: scale(0.97); }\n\n    .auth-links {"""
-          new_css = """    .auth-btn:active { transform: scale(0.97); }\n\n    .google-btn {\n      width: 100%; background: white; color: #202124; border: 1px solid #dadce0;\n      padding: 12px 13px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.95rem;\n      margin-top: 4px; margin-bottom: 4px; transition: all 0.2s ease;\n      display: flex; align-items: center; justify-content: center; gap: 10px;\n    }\n    .google-btn:hover { background: #f8f9fa; }\n    .google-btn:active { transform: scale(0.98); }\n    .google-btn:disabled { opacity: 0.6; cursor: wait; }\n\n    .auth-links {"""
-          if old_css not in text:
-              raise SystemExit("Could not find auth CSS insertion point")
-          text = text.replace(old_css, new_css, 1)
+          # Replace the entire Google login function with the mobile-safe redirect flow.
+          start = text.find('async function loginWithGoogle() {')
+          if start == -1:
+              raise SystemExit('Could not find loginWithGoogle()')
+          end = text.find('\n    // <!-- GOOGLE PROFILE DISPLAY ADDED -->', start)
+          if end == -1:
+              raise SystemExit('Could not find end of loginWithGoogle()')
 
-          old_html = """      </form>\n\n      <div class=\"auth-links\">"""
-          new_html = """      </form>\n\n      <button type=\"button\" class=\"google-btn\" id=\"google-login-btn\" onclick=\"loginWithGoogle()\">\n        <span style=\"font-size:1.1rem;\">G</span> Continue with Google\n      </button>\n\n      <div class=\"auth-links\">"""
-          if old_html not in text:
-              raise SystemExit("Could not find auth HTML insertion point")
-          text = text.replace(old_html, new_html, 1)
+          new_function = '''async function loginWithGoogle() {
+      if (!auth) {
+        alert("Firebase is not initialized!");
+        return;
+      }
 
-          old_js = """    function toggleAuthMode() {"""
-          new_js = """    // <!-- GOOGLE LOGIN ADDED -->\n    async function loginWithGoogle() {\n      if (!auth) {\n        alert(\"Firebase is not initialized!\");\n        return;\n      }\n\n      const btn = document.getElementById('google-login-btn');\n      if (btn) {\n        btn.disabled = true;\n        btn.innerHTML = '<span style=\"font-size:1.1rem;\">G</span> Connecting...';\n      }\n\n      try {\n        const provider = new firebase.auth.GoogleAuthProvider();\n        provider.setCustomParameters({ prompt: 'select_account' });\n        await auth.signInWithPopup(provider);\n        showToast('Welcome to Life RPG! 🎮');\n      } catch (err) {\n        console.error('Google sign-in error:', err);\n\n        if (err.code === 'auth/popup-closed-by-user') {\n          // The user simply closed the Google window; no error message needed.\n        } else if (err.code === 'auth/popup-blocked') {\n          alert('Google login was blocked by your browser. Allow pop-ups for this site and try again.');\n        } else if (err.code === 'auth/account-exists-with-different-credential') {\n          alert('There is already an account with this email using another login method. Log in with that method first.');\n        } else if (err.code === 'auth/unauthorized-domain') {\n          alert('This website is not authorized in Firebase. Add your app domain in Firebase Console → Authentication → Settings → Authorized domains.');\n        } else {\n          alert('Google login failed: ' + (err.message || err.code));\n        }\n      } finally {\n        if (btn) {\n          btn.disabled = false;\n          btn.innerHTML = '<span style=\"font-size:1.1rem;\">G</span> Continue with Google';\n        }\n      }\n    }\n\n    function toggleAuthMode() {"""
-          if old_js not in text:
-              raise SystemExit("Could not find auth JS insertion point")
-          text = text.replace(old_js, new_js, 1)
+      const btn = document.getElementById('google-login-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Connecting...';
+      }
 
-          path.write_text(text, encoding="utf-8")
-          print("Google login code added to index.html")
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        // Firebase recommends redirect for mobile web browsers.
+        await auth.signInWithRedirect(provider);
+      } catch (err) {
+        console.error('Google sign-in error:', err);
+        if (err.code === 'auth/unauthorized-domain') {
+          alert('This website is not authorized in Firebase. Check Authentication → Settings → Authorized domains.');
+        } else if (err.code === 'auth/operation-not-supported-in-this-environment') {
+          alert('Google login is not supported in this browser environment. Open Life RPG in Chrome or Edge and try again.');
+        } else {
+          alert('Google login failed: ' + (err.message || err.code));
+        }
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Continue with Google';
+        }
+      }
+    }'''
+          text = text[:start] + new_function + text[end:]
 
-      - name: Commit changes
+          # Handle the redirect result once after the page returns from Google.
+          marker = '// GOOGLE REDIRECT RESULT ADDED'
+          if marker not in text:
+              redirect_code = '''    // GOOGLE REDIRECT RESULT ADDED
+    auth.getRedirectResult().then((result) => {
+      if (result && result.user) {
+        console.log('Google login successful:', result.user.email);
+      }
+    }).catch((error) => {
+      console.error('Google redirect login error:', error);
+      if (error.code === 'auth/unauthorized-domain') {
+        console.error('Unauthorized Firebase domain:', window.location.hostname);
+      }
+    });
+
+'''
+              pos = text.find('auth.onAuthStateChanged(')
+              if pos == -1:
+                  raise SystemExit('Could not find auth.onAuthStateChanged()')
+              text = text[:pos] + redirect_code + text[pos:]
+
+          path.write_text(text, encoding='utf-8')
+          print('Google mobile login repaired.')
+
+      - name: Commit repair
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
           if git diff --cached --quiet; then
-            echo "No changes to commit."
+            echo "No changes needed."
             exit 0
           fi
-          git commit -m "Add Google sign-in button and Firebase Google auth"
+          git commit -m "Repair Google login on mobile"
           git push
