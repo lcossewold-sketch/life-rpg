@@ -2250,43 +2250,6 @@
      *
      * Firebase sends the user back to the app after Google login.
      */
-
-    if (auth) {
-
-      auth.getRedirectResult()
-
-        .then((result) => {
-
-          if (result && result.user) {
-
-            console.log(
-              'Google login successful:',
-              result.user.displayName ||
-              result.user.email
-            );
-
-            updateGoogleProfile(result.user);
-
-          }
-
-        })
-
-        .catch((error) => {
-
-          console.error(
-            'Google redirect login error:',
-            error
-          );
-
-          if (error.code === 'auth/unauthorized-domain') {
-
-            console.error(
-              'Unauthorized Firebase domain:',
-              window.location.hostname
-            );
-
-          }
-
         });
 
     }
