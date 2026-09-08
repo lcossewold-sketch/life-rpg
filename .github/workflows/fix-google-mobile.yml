@@ -1,0 +1,107 @@
+name: Fix Google login on mobile
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch Google login
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          # Remove the G letter that was shown before the Google button text.
+          text = text.replace('<span style="font-size:1.1rem;">G</span> Continue with Google', 'Continue with Google')
+          text = text.replace('>G</span> Continue with Google', '>Continue with Google')
+
+          # Use redirect instead of popup. This is much more reliable on phones/PWA installs.
+          old = '''async function loginWithGoogle() {
+      const googleBtn = document.getElementById('google-login-btn');
+      try {
+        if (googleBtn) googleBtn.disabled = true;
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        await auth.signInWithPopup(provider);
+      } catch (error) {
+        console.error('Google login error:', error);
+        if (error.code === 'auth/popup-closed-by-user') {
+          showAuthError('Google login was cancelled.');
+        } else if (error.code === 'auth/popup-blocked') {
+          showAuthError('Google login popup was blocked. Please allow popups and try again.');
+        } else if (error.code === 'auth/account-exists-with-different-credential') {
+          showAuthError('An account with this email already exists. Log in with your email and password first.');
+        } else if (error.code === 'auth/unauthorized-domain') {
+          showAuthError('This app domain is not authorized in Firebase. Add the current domain under Authentication > Settings > Authorized domains.');
+        } else {
+          showAuthError(error.message || 'Google login failed.');
+        }
+      } finally {
+        if (googleBtn) googleBtn.disabled = false;
+      }
+    }'''
+
+          new = '''async function loginWithGoogle() {
+      const googleBtn = document.getElementById('google-login-btn');
+      try {
+        if (googleBtn) googleBtn.disabled = true;
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        // Redirect works reliably on mobile browsers and installed PWAs.
+        await auth.signInWithRedirect(provider);
+      } catch (error) {
+        console.error('Google login error:', error);
+        if (error.code === 'auth/unauthorized-domain') {
+          showAuthError('This app domain is not authorized in Firebase. Add the current domain under Authentication > Settings > Authorized domains.');
+        } else if (error.code === 'auth/operation-not-supported-in-this-environment') {
+          showAuthError('Google login is not supported in this browser environment. Open Life RPG in Chrome or Safari and try again.');
+        } else {
+          showAuthError(error.message || 'Google login failed.');
+        }
+        if (googleBtn) googleBtn.disabled = false;
+      }
+    }'''
+
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif 'signInWithPopup(provider)' in text:
+              text = text.replace('await auth.signInWithPopup(provider);', 'await auth.signInWithRedirect(provider);', 1)
+
+          # Process the result after Google redirects back to Life RPG.
+          marker = '// GOOGLE REDIRECT RESULT ADDED'
+          if marker not in text:
+              redirect_code = '''\n    // GOOGLE REDIRECT RESULT ADDED\n    auth.getRedirectResult().then((result) => {\n      if (result && result.user) {\n        console.log('Google login successful:', result.user.email);\n      }\n    }).catch((error) => {\n      console.error('Google redirect login error:', error);\n      if (typeof showAuthError === 'function') {\n        if (error.code === 'auth/unauthorized-domain') {\n          showAuthError('This app domain is not authorized in Firebase. Add the current domain under Authentication > Settings > Authorized domains.');\n        } else {\n          showAuthError(error.message || 'Google login failed.');\n        }\n      }\n    });\n'''
+              pos = text.find('auth.onAuthStateChanged(')
+              if pos != -1:
+                  text = text[:pos] + redirect_code + '\n    ' + text[pos:]
+
+          path.write_text(text, encoding='utf-8')
+          print('Patched index.html')
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix Google login for mobile and remove G icon"
+          git push
+
+      - name: Remove one-time workflow
+        if: success()
+        run: |
+          git rm .github/workflows/fix-google-mobile.yml
+          git commit -m "Remove one-time Google login fix workflow"
+          git push
