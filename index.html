@@ -1831,84 +1831,80 @@
      * This is preferred for mobile browsers.
      */
 
-    async function loginWithGoogle() {
+   async function loginWithGoogle() {
 
-      if (!auth) {
+  if (!auth) {
+    alert("Firebase is not initialized!");
+    return;
+  }
 
-        alert("Firebase is not initialized!");
-        return;
+  const btn = document.getElementById('google-login-btn');
 
-      }
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = 'Connecting...';
+  }
 
-      const btn = document.getElementById('google-login-btn');
+  try {
 
-      if (btn) {
+    const provider = new firebase.auth.GoogleAuthProvider();
 
-        btn.disabled = true;
-        btn.innerText = 'Connecting...';
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
 
-      }
+    const result = await auth.signInWithPopup(provider);
 
-      try {
-
-        const provider = new firebase.auth.GoogleAuthProvider();
-
-        provider.setCustomParameters({
-          prompt: 'select_account'
-        });
-
-        /*
-         * Redirect to Google.
-         *
-         * After Google authentication the browser returns
-         * to this page and getRedirectResult() handles it.
-         */
-
-        await auth.signInWithRedirect(provider);
-
-      } catch (err) {
-
-        console.error('Google sign-in error:', err);
-
-        if (err.code === 'auth/unauthorized-domain') {
-
-          alert(
-            'This website is not authorized in Firebase.\n\n' +
-            'Go to Firebase Console → Authentication → Settings → Authorized domains ' +
-            'and make sure your website domain is listed.'
-          );
-
-        } else if (err.code === 'auth/account-exists-with-different-credential') {
-
-          alert(
-            'There is already an account with this email using another login method.'
-          );
-
-        } else if (err.code === 'auth/operation-not-supported-in-this-environment') {
-
-          alert(
-            'Google login is not supported in this browser environment. ' +
-            'Try Chrome or Edge.'
-          );
-
-        } else {
-
-          alert(
-            'Google login failed:\n\n' +
-            (err.message || err.code || 'Unknown error')
-          );
-
-        }
-
-        if (btn) {
-
-          btn.disabled = false;
-          btn.innerText = 'Continue with Google';
-
-        }
-
-      }
+    if (result && result.user) {
+      updateGoogleProfile(result.user);
     }
+
+  } catch (err) {
+
+    console.error('Google sign-in error:', err);
+
+    if (err.code === 'auth/popup-blocked') {
+
+      alert(
+        'Google login was blocked by your browser. ' +
+        'Allow popups for Life RPG and try again.'
+      );
+
+    } else if (err.code === 'auth/popup-closed-by-user') {
+
+      console.log('Google login cancelled.');
+
+    } else if (err.code === 'auth/unauthorized-domain') {
+
+      alert(
+        'This website is not authorized in Firebase.\n\n' +
+        'Go to Firebase → Authentication → Settings → Authorized domains ' +
+        'and make sure lcossewold-sketch.github.io is listed.'
+      );
+
+    } else if (
+      err.code === 'auth/account-exists-with-different-credential'
+    ) {
+
+      alert(
+        'There is already an account with this email using another login method.'
+      );
+
+    } else {
+
+      alert(
+        'Google login failed:\n\n' +
+        (err.message || err.code || 'Unknown error')
+      );
+
+    }
+
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = 'Continue with Google';
+    }
+  }
+}
 
     /*
      * GOOGLE PROFILE
