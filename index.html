@@ -104,6 +104,16 @@
     }
     .auth-btn:active { transform: scale(0.97); }
 
+    .google-btn {
+      width: 100%; background: white; color: #202124; border: 1px solid #dadce0;
+      padding: 12px 13px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.95rem;
+      margin-top: 4px; margin-bottom: 4px; transition: all 0.2s ease;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .google-btn:hover { background: #f8f9fa; }
+    .google-btn:active { transform: scale(0.98); }
+    .google-btn:disabled { opacity: 0.6; cursor: wait; }
+
     .auth-links { display: flex; flex-direction: column; gap: 10px; text-align: center; margin-top: 10px; }
     .auth-toggle, .auth-forgot { background: none; border: none; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; text-decoration: none; font-family: inherit; transition: color 0.2s; }
     .auth-toggle:hover { color: var(--text-main); }
@@ -258,6 +268,10 @@
 
         <button type="submit" class="auth-btn" id="auth-submit-btn">Log In</button>
       </form>
+
+      <button type="button" class="google-btn" id="google-login-btn" onclick="loginWithGoogle()">
+        <span style="font-size:1.1rem;">G</span> Continue with Google
+      </button>
 
       <div class="auth-links">
         <button type="button" class="auth-toggle" id="auth-toggle-btn" onclick="toggleAuthMode()">Don't have an account? Register here</button>
@@ -508,6 +522,46 @@
 
     window.addEventListener('online', updateNetworkStatus);
     window.addEventListener('offline', updateNetworkStatus);
+
+    // <!-- GOOGLE LOGIN ADDED -->
+    async function loginWithGoogle() {
+      if (!auth) {
+        alert("Firebase is not initialized!");
+        return;
+      }
+
+      const btn = document.getElementById('google-login-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span style="font-size:1.1rem;">G</span> Connecting...';
+      }
+
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        await auth.signInWithPopup(provider);
+        showToast('Welcome to Life RPG! 🎮');
+      } catch (err) {
+        console.error('Google sign-in error:', err);
+
+        if (err.code === 'auth/popup-closed-by-user') {
+          // The user simply closed the Google window; no error message needed.
+        } else if (err.code === 'auth/popup-blocked') {
+          alert('Google login was blocked by your browser. Allow pop-ups for this site and try again.');
+        } else if (err.code === 'auth/account-exists-with-different-credential') {
+          alert('There is already an account with this email using another login method. Log in with that method first.');
+        } else if (err.code === 'auth/unauthorized-domain') {
+          alert('This website is not authorized in Firebase. Add your app domain in Firebase Console → Authentication → Settings → Authorized domains.');
+        } else {
+          alert('Google login failed: ' + (err.message || err.code));
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span style="font-size:1.1rem;">G</span> Continue with Google';
+        }
+      }
+    }
 
     function toggleAuthMode() {
       isRegisterMode = !isRegisterMode;
